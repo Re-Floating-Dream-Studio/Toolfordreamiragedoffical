@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单位换算工具 - Dreamirage Tool</title>
+    <meta name="description" content="长度、重量、面积等多种单位间的快速转换工具">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 使用本地MiSans字体，不再引用Google Fonts */
+        
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 12px 30px rgba(67, 97, 238, 0.15);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'MiSans', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .home-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .home-btn i {
+            margin-right: 6px;
+        }
+        
+        .home-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .converter-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .converter-section {
+            margin-bottom: 30px;
+        }
+        
+        .result {
+            background-color: rgba(67, 97, 238, 0.05);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            color: var(--primary-color);
+        }
+        
+        .footer {
+            background-color: var(--card-bg);
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+            margin-top: auto;
+        }
+        
+        .copyright {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        /* 单位类别选择 */
+        .unit-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            gap: 10px;
+        }
+        
+        .unit-tab {
+            padding: 8px 15px;
+            background-color: rgba(67, 97, 238, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .unit-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .unit-tab:hover:not(.active) {
+            background-color: rgba(67, 97, 238, 0.2);
+        }
+        
+        .converter-container {
+            display: none;
+        }
+        
+        .converter-container.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="../index.html" class="logo-container">
+                <img src="../img/logo.png" alt="Dreamirage Logo" class="logo">
+                <h1 class="title">单位换算工具</h1>
+            </a>
+            <a href="../index.html" class="home-btn">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2 class="card-title">单位换算工具</h2>
+                
+                <div class="unit-tabs">
+                    <div class="unit-tab active" data-type="length">长度</div>
+                    <div class="unit-tab" data-type="area">面积</div>
+                    <div class="unit-tab" data-type="weight">重量</div>
+                    <div class="unit-tab" data-type="volume">体积</div>
+                    <div class="unit-tab" data-type="temperature">温度</div>
+                    <div class="unit-tab" data-type="speed">速度</div>
+                </div>
+                
+                <!-- 长度转换 -->
+                <div class="converter-container active" id="length">
+                    <div class="converter-grid">
+                        <div class="form-group">
+                            <label for="length-input">输入值:</label>
+                            <input type="number" id="length-input" placeholder="输入数值">
+                        </div>
+                        <div class="form-group">
+                            <label for="length-from">从:</label>
+                            <select id="length-from">
+                                <option value="mm">毫米 (mm)</option>
+                                <option value="cm">厘米 (cm)</option>
+                                <option value="m" selected>米 (m)</option>
+                                <option value="km">千米 (km)</option>
+                                <option value="in">英寸 (in)</option>
+                                <option value="ft">英尺 (ft)</option>
+                                <option value="yd">码 (yd)</option>
+                                <option value="mi">英里 (mi)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="length-to">转换为:</label>
+                        <select id="length-to">
+                            <option value="mm">毫米 (mm)</option>
+                            <option value="cm" selected>厘米 (cm)</option>
+                            <option value="m">米 (m)</option>
+                            <option value="km">千米 (km)</option>
+                            <option value="in">英寸 (in)</option>
+                            <option value="ft">英尺 (ft)</option>
+                            <option value="yd">码 (yd)</option>
+                            <option value="mi">英里 (mi)</option>
+                        </select>
+                    </div>
+                    <div class="result" id="length-result">
+                        结果将显示在这里
+                    </div>
+                </div>
+                
+                <!-- 其他单位转换部分 (未显示) -->
+                <div class="converter-container" id="area">
+                    <!-- 面积转换内容将通过JavaScript动态更新 -->
+                    <p style="text-align: center; padding: 30px;">面积转换功能即将上线，敬请期待！</p>
+                </div>
+                
+                <div class="converter-container" id="weight">
+                    <!-- 重量转换内容将通过JavaScript动态更新 -->
+                    <p style="text-align: center; padding: 30px;">重量转换功能即将上线，敬请期待！</p>
+                </div>
+                
+                <div class="converter-container" id="volume">
+                    <!-- 体积转换内容将通过JavaScript动态更新 -->
+                    <p style="text-align: center; padding: 30px;">体积转换功能即将上线，敬请期待！</p>
+                </div>
+                
+                <div class="converter-container" id="temperature">
+                    <!-- 温度转换内容将通过JavaScript动态更新 -->
+                    <p style="text-align: center; padding: 30px;">温度转换功能即将上线，敬请期待！</p>
+                </div>
+                
+                <div class="converter-container" id="speed">
+                    <!-- 速度转换内容将通过JavaScript动态更新 -->
+                    <p style="text-align: center; padding: 30px;">速度转换功能即将上线，敬请期待！</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        <p class="copyright">© 2025 Dreamirage Tool - 版权所有 | 保留所有权利</p>
+    </footer>
+    
+    <script>
+        // 单位标签切换
+        const unitTabs = document.querySelectorAll('.unit-tab');
+        const converterContainers = document.querySelectorAll('.converter-container');
+        
+        unitTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有活动状态
+                unitTabs.forEach(t => t.classList.remove('active'));
+                converterContainers.forEach(c => c.classList.remove('active'));
+                
+                // 添加当前活动状态
+                tab.classList.add('active');
+                const type = tab.getAttribute('data-type');
+                document.getElementById(type).classList.add('active');
+            });
+        });
+        
+        // 长度单位转换功能
+        const lengthInput = document.getElementById('length-input');
+        const lengthFrom = document.getElementById('length-from');
+        const lengthTo = document.getElementById('length-to');
+        const lengthResult = document.getElementById('length-result');
+        
+        // 长度转换比率 (相对于米)
+        const lengthRatios = {
+            mm: 0.001,
+            cm: 0.01,
+            m: 1,
+            km: 1000,
+            in: 0.0254,
+            ft: 0.3048,
+            yd: 0.9144,
+            mi: 1609.344
+        };
+        
+        // 计算和显示结果
+        function calculateLength() {
+            if (!lengthInput.value) {
+                lengthResult.textContent = '请输入数值';
+                return;
+            }
+            
+            const inputValue = parseFloat(lengthInput.value);
+            const fromUnit = lengthFrom.value;
+            const toUnit = lengthTo.value;
+            
+            // 转换为标准单位 (米)，然后转换为目标单位
+            const meters = inputValue * lengthRatios[fromUnit];
+            const result = meters / lengthRatios[toUnit];
+            
+            lengthResult.textContent = `${inputValue} ${getUnitFullName(fromUnit)} = ${result.toFixed(6)} ${getUnitFullName(toUnit)}`;
+        }
+        
+        // 获取单位全名
+        function getUnitFullName(unit) {
+            const unitNames = {
+                mm: '毫米',
+                cm: '厘米',
+                m: '米',
+                km: '千米',
+                in: '英寸',
+                ft: '英尺',
+                yd: '码',
+                mi: '英里'
+            };
+            return unitNames[unit] || unit;
+        }
+        
+        // 添加事件监听器
+        lengthInput.addEventListener('input', calculateLength);
+        lengthFrom.addEventListener('change', calculateLength);
+        lengthTo.addEventListener('change', calculateLength);
+        
+        // 初始加载时计算一次 (如果有输入值)
+        if (lengthInput.value) {
+            calculateLength();
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二维码生成器 - Dreamirage Tool</title>
+    <meta name="description" content="为文本、URL等内容快速生成二维码">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.staticfile.org/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'MiSans', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .home-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .home-btn i {
+            margin-right: 6px;
+        }
+        
+        .home-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        @media (min-width: 768px) {
+            .qr-container {
+                flex-direction: row;
+            }
+        }
+        
+        .qr-form {
+            flex: 1;
+        }
+        
+        .qr-preview {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .option-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option-column {
+            flex: 1;
+        }
+        
+        .color-input {
+            display: flex;
+            align-items: center;
+        }
+        
+        input[type="color"] {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            border-radius: 4px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn.secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn.secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .qr-output {
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+            margin-bottom: 20px;
+        }
+        
+        .qr-message {
+            color: var(--text-light);
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .download-btn {
+            margin-top: 15px;
+            background-color: var(--accent-color);
+        }
+        
+        .download-btn:hover {
+            background-color: #3d80d6;
+        }
+        
+        .preset-links {
+            margin-top: 20px;
+        }
+        
+        .preset-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .preset-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .preset-link {
+            padding: 6px 12px;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .preset-link:hover {
+            background-color: rgba(67, 97, 238, 0.2);
+        }
+        
+        .footer {
+            background-color: var(--card-bg);
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+            margin-top: auto;
+        }
+        
+        .copyright {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .error-message {
+            color: #e53e3e;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab:hover:not(.active) {
+            border-bottom-color: #ddd;
+        }
+        
+        .tab-content {
+            display: none;
+            padding-top: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="../index.html" class="logo-container">
+                <img src="../img/logo.png" alt="Dreamirage Logo" class="logo">
+                <h1 class="title">二维码生成器</h1>
+            </a>
+            <a href="../index.html" class="home-btn">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2 class="card-title">二维码生成器工具</h2>
+                
+                <div class="qr-container">
+                    <div class="qr-form">
+                        <div class="tab-container">
+                            <div class="tabs">
+                                <div class="tab active" data-tab="url">网址</div>
+                                <div class="tab" data-tab="text">文本</div>
+                                <div class="tab" data-tab="contact">联系方式</div>
+                                <div class="tab" data-tab="wifi">WiFi</div>
+                            </div>
+                            
+                            <!-- URL内容 -->
+                            <div class="tab-content active" id="url-content">
+                                <div class="form-group">
+                                    <label for="url-input">输入网址:</label>
+                                    <input type="url" id="url-input" placeholder="https://www.example.com" value="https://www.example.com">
+                                    <div class="error-message" id="url-error">请输入有效的网址</div>
+                                </div>
+                            </div>
+                            
+                            <!-- 文本内容 -->
+                            <div class="tab-content" id="text-content">
+                                <div class="form-group">
+                                    <label for="text-input">输入文本内容:</label>
+                                    <textarea id="text-input" placeholder="在这里输入任意文本内容..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- 联系方式内容 -->
+                            <div class="tab-content" id="contact-content">
+                                <div class="form-group">
+                                    <label for="contact-name">姓名:</label>
+                                    <input type="text" id="contact-name" placeholder="张三">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contact-phone">电话号码:</label>
+                                    <input type="tel" id="contact-phone" placeholder="13800138000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contact-email">电子邮箱:</label>
+                                    <input type="email" id="contact-email" placeholder="example@email.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contact-company">公司 (可选):</label>
+                                    <input type="text" id="contact-company" placeholder="公司名称">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contact-address">地址 (可选):</label>
+                                    <input type="text" id="contact-address" placeholder="地址">
+                                </div>
+                            </div>
+                            
+                            <!-- WiFi内容 -->
+                            <div class="tab-content" id="wifi-content">
+                                <div class="form-group">
+                                    <label for="wifi-ssid">WiFi名称 (SSID):</label>
+                                    <input type="text" id="wifi-ssid" placeholder="WiFi网络名称">
+                                </div>
+                                <div class="form-group">
+                                    <label for="wifi-password">密码:</label>
+                                    <input type="text" id="wifi-password" placeholder="WiFi密码">
+                                </div>
+                                <div class="form-group">
+                                    <label for="wifi-encryption">加密类型:</label>
+                                    <select id="wifi-encryption">
+                                        <option value="WPA">WPA/WPA2</option>
+                                        <option value="WEP">WEP</option>
+                                        <option value="nopass">无密码</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="wifi-hidden">隐藏网络:</label>
+                                    <select id="wifi-hidden">
+                                        <option value="false">否</option>
+                                        <option value="true">是</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-group">
+                            <div class="option-column">
+                                <div class="form-group">
+                                    <label for="qr-size">二维码大小:</label>
+                                    <select id="qr-size">
+                                        <option value="128">小 (128x128)</option>
+                                        <option value="200" selected>中 (200x200)</option>
+                                        <option value="300">大 (300x300)</option>
+                                        <option value="400">超大 (400x400)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="option-column">
+                                <div class="form-group">
+                                    <label for="error-correction">容错级别:</label>
+                                    <select id="error-correction">
+                                        <option value="L">低 (7%)</option>
+                                        <option value="M" selected>中 (15%)</option>
+                                        <option value="Q">高 (25%)</option>
+                                        <option value="H">超高 (30%)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-group">
+                            <div class="option-column">
+                                <div class="form-group">
+                                    <label for="foreground-color">前景色:</label>
+                                    <div class="color-input">
+                                        <input type="color" id="foreground-color" value="#000000">
+                                        <input type="text" id="foreground-color-text" value="#000000">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="option-column">
+                                <div class="form-group">
+                                    <label for="background-color">背景色:</label>
+                                    <div class="color-input">
+                                        <input type="color" id="background-color" value="#ffffff">
+                                        <input type="text" id="background-color-text" value="#ffffff">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" id="generate-btn">
+                            <i class="fas fa-qrcode"></i> 生成二维码
+                        </button>
+                        
+                        <div class="preset-links">
+                            <div class="preset-title">快速链接:</div>
+                            <div class="preset-list">
+                                <div class="preset-link" data-type="url" data-value="https://www.baidu.com">百度</div>
+                                <div class="preset-link" data-type="url" data-value="https://weixin.qq.com">微信</div>
+                                <div class="preset-link" data-type="url" data-value="https://www.taobao.com">淘宝</div>
+                                <div class="preset-link" data-type="url" data-value="https://www.jd.com">京东</div>
+                                <div class="preset-link" data-type="url" data-value="https://www.alipay.com">支付宝</div>
+                                <div class="preset-link" data-type="text" data-value="这是一段示例文本，用于演示二维码生成器的文本功能。">示例文本</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="qr-preview">
+                        <div class="qr-output" id="qr-output">
+                            <div class="qr-message">点击"生成二维码"按钮生成二维码</div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="btn download-btn" id="download-btn" disabled>
+                                <i class="fas fa-download"></i> 下载二维码
+                            </button>
+                            <button class="btn secondary" id="reset-btn">
+                                <i class="fas fa-undo"></i> 重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        <p class="copyright">© 2025 Dreamirage Tool - 版权所有 | 保留所有权利</p>
+    </footer>
+    
+    <script>
+        // DOM元素
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const generateBtn = document.getElementById('generate-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const qrOutput = document.getElementById('qr-output');
+        const urlInput = document.getElementById('url-input');
+        const textInput = document.getElementById('text-input');
+        const contactName = document.getElementById('contact-name');
+        const contactPhone = document.getElementById('contact-phone');
+        const contactEmail = document.getElementById('contact-email');
+        const contactCompany = document.getElementById('contact-company');
+        const contactAddress = document.getElementById('contact-address');
+        const wifiSsid = document.getElementById('wifi-ssid');
+        const wifiPassword = document.getElementById('wifi-password');
+        const wifiEncryption = document.getElementById('wifi-encryption');
+        const wifiHidden = document.getElementById('wifi-hidden');
+        const qrSize = document.getElementById('qr-size');
+        const errorCorrection = document.getElementById('error-correction');
+        const foregroundColor = document.getElementById('foreground-color');
+        const foregroundColorText = document.getElementById('foreground-color-text');
+        const backgroundColor = document.getElementById('background-color');
+        const backgroundColorText = document.getElementById('background-color-text');
+        const presetLinks = document.querySelectorAll('.preset-link');
+        const urlError = document.getElementById('url-error');
+        
+        // 当前活动的标签
+        let activeTab = 'url';
+        
+        // 初始化QR Code对象
+        let qrcode = null;
+        
+        // 标签切换
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有活动状态
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // 添加当前活动状态
+                tab.classList.add('active');
+                activeTab = tab.getAttribute('data-tab');
+                document.getElementById(`${activeTab}-content`).classList.add('active');
+            });
+        });
+        
+        // 颜色输入同步
+        foregroundColor.addEventListener('input', () => {
+            foregroundColorText.value = foregroundColor.value;
+        });
+        
+        foregroundColorText.addEventListener('input', () => {
+            if (/^#[0-9A-F]{6}$/i.test(foregroundColorText.value)) {
+                foregroundColor.value = foregroundColorText.value;
+            }
+        });
+        
+        backgroundColor.addEventListener('input', () => {
+            backgroundColorText.value = backgroundColor.value;
+        });
+        
+        backgroundColorText.addEventListener('input', () => {
+            if (/^#[0-9A-F]{6}$/i.test(backgroundColorText.value)) {
+                backgroundColor.value = backgroundColorText.value;
+            }
+        });
+        
+        // 验证URL
+        function validateUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        // 生成vCard格式的联系人信息
+        function generateVCard() {
+            let vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
+            
+            if (contactName.value) {
+                vcard += `FN:${contactName.value}\n`;
+                vcard += `N:${contactName.value};;;\n`;
+            }
+            
+            if (contactPhone.value) {
+                vcard += `TEL;TYPE=CELL:${contactPhone.value}\n`;
+            }
+            
+            if (contactEmail.value) {
+                vcard += `EMAIL:${contactEmail.value}\n`;
+            }
+            
+            if (contactCompany.value) {
+                vcard += `ORG:${contactCompany.value}\n`;
+            }
+            
+            if (contactAddress.value) {
+                vcard += `ADR:;;${contactAddress.value};;;;\n`;
+            }
+            
+            vcard += 'END:VCARD';
+            return vcard;
+        }
+        
+        // 生成WiFi配置
+        function generateWifi() {
+            const ssid = wifiSsid.value;
+            const password = wifiPassword.value;
+            const encryption = wifiEncryption.value;
+            const hidden = wifiHidden.value === 'true' ? 'H:true' : '';
+            
+            // 如果没有密码且选择了"无密码"，则使用nopass
+            if (encryption === 'nopass' || !password) {
+                return `WIFI:T:nopass;S:${ssid};${hidden};;`;
+            }
+            
+            return `WIFI:T:${encryption};S:${ssid};P:${password};${hidden};;`;
+        }
+        
+        // 获取二维码内容
+        function getQRContent() {
+            switch (activeTab) {
+                case 'url':
+                    const url = urlInput.value.trim();
+                    if (!validateUrl(url)) {
+                        urlError.style.display = 'block';
+                        return null;
+                    }
+                    urlError.style.display = 'none';
+                    return url;
+                    
+                case 'text':
+                    return textInput.value.trim();
+                    
+                case 'contact':
+                    return generateVCard();
+                    
+                case 'wifi':
+                    return generateWifi();
+                    
+                default:
+                    return null;
+            }
+        }
+        
+        // 生成二维码
+        generateBtn.addEventListener('click', generateQRCode);
+        
+        function generateQRCode() {
+            const content = getQRContent();
+            
+            if (!content) {
+                alert('请输入有效内容');
+                return;
+            }
+            
+            // 清空之前的二维码
+            qrOutput.innerHTML = '';
+            
+            // 如果已存在二维码对象，先清除
+            if (qrcode) {
+                qrcode.clear();
+            }
+            
+            // 创建新的二维码
+            qrcode = new QRCode(qrOutput, {
+                text: content,
+                width: parseInt(qrSize.value),
+                height: parseInt(qrSize.value),
+                colorDark: foregroundColor.value,
+                colorLight: backgroundColor.value,
+                correctLevel: QRCode.CorrectLevel[errorCorrection.value]
+            });
+            
+            // 启用下载按钮
+            downloadBtn.disabled = false;
+        }
+        
+        // 下载二维码
+        downloadBtn.addEventListener('click', () => {
+            const canvas = qrOutput.querySelector('canvas');
+            
+            if (!canvas) {
+                alert('请先生成二维码');
+                return;
+            }
+            
+            // 创建临时链接
+            const link = document.createElement('a');
+            link.download = '二维码.png';
+            link.href = canvas.toDataURL('image/png');
+            
+            // 模拟点击下载
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        // 重置表单
+        resetBtn.addEventListener('click', () => {
+            // 重置表单内容
+            urlInput.value = 'https://www.example.com';
+            textInput.value = '';
+            contactName.value = '';
+            contactPhone.value = '';
+            contactEmail.value = '';
+            contactCompany.value = '';
+            contactAddress.value = '';
+            wifiSsid.value = '';
+            wifiPassword.value = '';
+            wifiEncryption.value = 'WPA';
+            wifiHidden.value = 'false';
+            qrSize.value = '200';
+            errorCorrection.value = 'M';
+            foregroundColor.value = '#000000';
+            foregroundColorText.value = '#000000';
+            backgroundColor.value = '#ffffff';
+            backgroundColorText.value = '#ffffff';
+            
+            // 隐藏错误信息
+            urlError.style.display = 'none';
+            
+            // 清空二维码
+            qrOutput.innerHTML = '<div class="qr-message">点击"生成二维码"按钮生成二维码</div>';
+            
+            // 如果存在二维码对象，清除它
+            if (qrcode) {
+                qrcode.clear();
+                qrcode = null;
+            }
+            
+            // 禁用下载按钮
+            downloadBtn.disabled = true;
+            
+            // 重置为URL标签
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            document.querySelector('[data-tab="url"]').classList.add('active');
+            document.getElementById('url-content').classList.add('active');
+            activeTab = 'url';
+        });
+        
+        // 快速链接点击
+        presetLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                const type = link.getAttribute('data-type');
+                const value = link.getAttribute('data-value');
+                
+                // 切换到对应的标签
+                tabs.forEach(tab => tab.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                document.querySelector(`[data-tab="${type}"]`).classList.add('active');
+                document.getElementById(`${type}-content`).classList.add('active');
+                activeTab = type;
+                
+                // 设置值
+                if (type === 'url') {
+                    urlInput.value = value;
+                } else if (type === 'text') {
+                    textInput.value = value;
+                }
+                
+                // 自动生成二维码
+                generateQRCode();
+            });
+        });
+    </script>
+</body>
+</html> 

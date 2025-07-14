@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日期计算器 - Dreamirage Tool</title>
+    <meta name="description" content="计算日期差异、工作日，添加或减去天数">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .home-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .home-btn i {
+            margin-right: 6px;
+        }
+        
+        .home-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .tab-container {
+            margin-bottom: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab:hover:not(.active) {
+            border-bottom-color: #ddd;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .result-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .result-text {
+            font-size: 18px;
+            color: var(--text-color);
+        }
+        
+        .highlight {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .input-group .form-input {
+            flex: 1;
+        }
+        
+        .input-addon {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            color: var(--text-light);
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .checkbox-label {
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .holidays-container {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .footer {
+            background-color: var(--card-bg);
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+            margin-top: auto;
+        }
+        
+        .copyright {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="../index.html" class="logo-container">
+                <img src="../img/logo.png" alt="Dreamirage Logo" class="logo">
+                <h1 class="title">日期计算器</h1>
+            </a>
+            <a href="../index.html" class="home-btn">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2 class="card-title">日期计算器</h2>
+                
+                <div class="tab-container">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="date-diff">日期差异</div>
+                        <div class="tab" data-tab="add-subtract">日期加减</div>
+                        <div class="tab" data-tab="workdays">工作日计算</div>
+                    </div>
+                    
+                    <!-- 日期差异 -->
+                    <div class="tab-content active" id="date-diff">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="date-diff-start">开始日期:</label>
+                                <input type="date" class="form-input" id="date-diff-start">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="date-diff-end">结束日期:</label>
+                                <input type="date" class="form-input" id="date-diff-end">
+                            </div>
+                        </div>
+                        
+                        <button class="btn" id="calculate-diff-btn">
+                            <i class="fas fa-calculator"></i> 计算日期差异
+                        </button>
+                        
+                        <div class="result-container" id="date-diff-result" style="display: none;">
+                            <div class="result-title">计算结果:</div>
+                            <div class="result-text" id="date-diff-text"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 日期加减 -->
+                    <div class="tab-content" id="add-subtract">
+                        <div class="form-group">
+                            <label class="form-label" for="add-subtract-date">基准日期:</label>
+                            <input type="date" class="form-input" id="add-subtract-date">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">操作:</label>
+                            <div class="input-group">
+                                <select class="form-input" id="add-subtract-operation">
+                                    <option value="add">加上</option>
+                                    <option value="subtract">减去</option>
+                                </select>
+                                
+                                <input type="number" class="form-input" id="add-subtract-value" min="1" value="1">
+                                
+                                <select class="form-input" id="add-subtract-unit">
+                                    <option value="days">天</option>
+                                    <option value="weeks">周</option>
+                                    <option value="months">月</option>
+                                    <option value="years">年</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" id="calculate-add-subtract-btn">
+                            <i class="fas fa-calculator"></i> 计算结果日期
+                        </button>
+                        
+                        <div class="result-container" id="add-subtract-result" style="display: none;">
+                            <div class="result-title">计算结果:</div>
+                            <div class="result-text" id="add-subtract-text"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 工作日计算 -->
+                    <div class="tab-content" id="workdays">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="workdays-start">开始日期:</label>
+                                <input type="date" class="form-input" id="workdays-start">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="workdays-end">结束日期:</label>
+                                <input type="date" class="form-input" id="workdays-end">
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="checkbox-input" id="workdays-include-start">
+                            <label class="checkbox-label" for="workdays-include-start">包含开始日期</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="checkbox-input" id="workdays-include-end">
+                            <label class="checkbox-label" for="workdays-include-end">包含结束日期</label>
+                        </div>
+                        
+                        <button class="btn" id="calculate-workdays-btn">
+                            <i class="fas fa-calculator"></i> 计算工作日
+                        </button>
+                        
+                        <div class="result-container" id="workdays-result" style="display: none;">
+                            <div class="result-title">计算结果:</div>
+                            <div class="result-text" id="workdays-text"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        <p class="copyright">© 2025 Dreamirage Tool - 版权所有 | 保留所有权利</p>
+    </footer>
+    
+    <script>
+        // DOM元素
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // 日期差异
+        const dateDiffStart = document.getElementById('date-diff-start');
+        const dateDiffEnd = document.getElementById('date-diff-end');
+        const calculateDiffBtn = document.getElementById('calculate-diff-btn');
+        const dateDiffResult = document.getElementById('date-diff-result');
+        const dateDiffText = document.getElementById('date-diff-text');
+        
+        // 日期加减
+        const addSubtractDate = document.getElementById('add-subtract-date');
+        const addSubtractOperation = document.getElementById('add-subtract-operation');
+        const addSubtractValue = document.getElementById('add-subtract-value');
+        const addSubtractUnit = document.getElementById('add-subtract-unit');
+        const calculateAddSubtractBtn = document.getElementById('calculate-add-subtract-btn');
+        const addSubtractResult = document.getElementById('add-subtract-result');
+        const addSubtractText = document.getElementById('add-subtract-text');
+        
+        // 工作日计算
+        const workdaysStart = document.getElementById('workdays-start');
+        const workdaysEnd = document.getElementById('workdays-end');
+        const workdaysIncludeStart = document.getElementById('workdays-include-start');
+        const workdaysIncludeEnd = document.getElementById('workdays-include-end');
+        const calculateWorkdaysBtn = document.getElementById('calculate-workdays-btn');
+        const workdaysResult = document.getElementById('workdays-result');
+        const workdaysText = document.getElementById('workdays-text');
+        
+        // 初始化当前日期
+        const today = new Date();
+        const todayStr = formatDateForInput(today);
+        
+        dateDiffStart.value = todayStr;
+        dateDiffEnd.value = todayStr;
+        addSubtractDate.value = todayStr;
+        workdaysStart.value = todayStr;
+        workdaysEnd.value = todayStr;
+        
+        // 标签切换
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有活动状态
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // 添加当前活动状态
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // 计算日期差异
+        calculateDiffBtn.addEventListener('click', () => {
+            const startDate = new Date(dateDiffStart.value);
+            const endDate = new Date(dateDiffEnd.value);
+            
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                alert('请选择有效的日期');
+                return;
+            }
+            
+            // 计算天数差异
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // 计算月份差异
+            let months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+            months += endDate.getMonth() - startDate.getMonth();
+            
+            // 计算年份差异
+            const years = Math.floor(months / 12);
+            const remainingMonths = months % 12;
+            
+            // 判断日期顺序
+            const dateOrder = startDate <= endDate ? '之后' : '之前';
+            
+            // 构建结果文本
+            let resultText = `<p>两个日期相差 <span class="highlight">${diffDays}</span> 天</p>`;
+            
+            if (months > 0 || years > 0) {
+                resultText += `<p>相当于 <span class="highlight">${years}</span> 年 <span class="highlight">${remainingMonths}</span> 个月</p>`;
+            }
+            
+            resultText += `<p>${formatDate(endDate)} 是 ${formatDate(startDate)} ${dateOrder}</p>`;
+            
+            // 显示结果
+            dateDiffText.innerHTML = resultText;
+            dateDiffResult.style.display = 'block';
+        });
+        
+        // 计算日期加减
+        calculateAddSubtractBtn.addEventListener('click', () => {
+            const baseDate = new Date(addSubtractDate.value);
+            
+            if (isNaN(baseDate.getTime())) {
+                alert('请选择有效的日期');
+                return;
+            }
+            
+            const operation = addSubtractOperation.value;
+            const value = parseInt(addSubtractValue.value);
+            const unit = addSubtractUnit.value;
+            
+            if (isNaN(value) || value <= 0) {
+                alert('请输入有效的数值');
+                return;
+            }
+            
+            // 计算新日期
+            const resultDate = new Date(baseDate);
+            
+            switch (unit) {
+                case 'days':
+                    resultDate.setDate(baseDate.getDate() + (operation === 'add' ? value : -value));
+                    break;
+                case 'weeks':
+                    resultDate.setDate(baseDate.getDate() + (operation === 'add' ? value * 7 : -value * 7));
+                    break;
+                case 'months':
+                    resultDate.setMonth(baseDate.getMonth() + (operation === 'add' ? value : -value));
+                    break;
+                case 'years':
+                    resultDate.setFullYear(baseDate.getFullYear() + (operation === 'add' ? value : -value));
+                    break;
+            }
+            
+            // 构建结果文本
+            const operationText = operation === 'add' ? '加上' : '减去';
+            const unitText = {
+                'days': '天',
+                'weeks': '周',
+                'months': '个月',
+                'years': '年'
+            }[unit];
+            
+            const resultText = `
+                <p>${formatDate(baseDate)} ${operationText} ${value} ${unitText} 是:</p>
+                <p class="highlight">${formatDate(resultDate)}</p>
+                <p>星期${getWeekdayName(resultDate.getDay())}</p>
+            `;
+            
+            // 显示结果
+            addSubtractText.innerHTML = resultText;
+            addSubtractResult.style.display = 'block';
+        });
+        
+        // 计算工作日
+        calculateWorkdaysBtn.addEventListener('click', () => {
+            const startDate = new Date(workdaysStart.value);
+            const endDate = new Date(workdaysEnd.value);
+            
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                alert('请选择有效的日期');
+                return;
+            }
+            
+            // 确保开始日期不晚于结束日期
+            if (startDate > endDate) {
+                alert('开始日期不能晚于结束日期');
+                return;
+            }
+            
+            // 计算工作日
+            const includeStart = workdaysIncludeStart.checked;
+            const includeEnd = workdaysIncludeEnd.checked;
+            
+            const workdaysCount = countWorkdays(
+                startDate, 
+                endDate, 
+                includeStart, 
+                includeEnd
+            );
+            
+            // 构建结果文本
+            const resultText = `
+                <p>从 ${formatDate(startDate)} 到 ${formatDate(endDate)} 之间的工作日天数为:</p>
+                <p class="highlight">${workdaysCount} 天</p>
+                <p><small>（工作日指周一至周五，不包括周末）</small></p>
+            `;
+            
+            // 显示结果
+            workdaysText.innerHTML = resultText;
+            workdaysResult.style.display = 'block';
+        });
+        
+        // 计算工作日数量
+        function countWorkdays(startDate, endDate, includeStart, includeEnd) {
+            // 克隆日期，避免修改原始日期
+            let start = new Date(startDate);
+            let end = new Date(endDate);
+            
+            // 调整日期，根据是否包含开始/结束日期
+            if (!includeStart) {
+                start.setDate(start.getDate() + 1);
+            }
+            
+            if (!includeEnd) {
+                end.setDate(end.getDate() - 1);
+            }
+            
+            // 如果调整后开始日期晚于结束日期，返回0
+            if (start > end) {
+                return 0;
+            }
+            
+            // 计算总天数
+            const totalDays = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+            
+            // 计算周末数量
+            let weekendCount = 0;
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const day = d.getDay();
+                if (day === 0 || day === 6) { // 0是周日，6是周六
+                    weekendCount++;
+                }
+            }
+            
+            // 工作日 = 总天数 - 周末数量
+            return totalDays - weekendCount;
+        }
+        
+        // 格式化日期为输入字段格式 (YYYY-MM-DD)
+        function formatDateForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // 格式化日期为显示格式 (YYYY年MM月DD日)
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            return `${year}年${month}月${day}日`;
+        }
+        
+        // 获取星期几的名称
+        function getWeekdayName(weekday) {
+            const weekdayNames = ['日', '一', '二', '三', '四', '五', '六'];
+            return weekdayNames[weekday];
+        }
+    </script>
+</body>
+</html> 

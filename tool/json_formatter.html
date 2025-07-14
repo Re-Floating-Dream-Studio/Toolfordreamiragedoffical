@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON格式化工具 - Dreamirage Tool</title>
+    <meta name="description" content="轻松格式化、验证和美化JSON数据">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'MiSans', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .home-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .home-btn i {
+            margin-right: 6px;
+        }
+        
+        .home-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn.secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn.secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn.success {
+            background-color: #42b883;
+        }
+        
+        .btn.success:hover {
+            background-color: #3aa876;
+        }
+        
+        .textarea-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .code-area {
+            width: 100%;
+            height: 400px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            font-family: 'MiSans', monospace;
+            tab-size: 2;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+        
+        .json-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .clear-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #666;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .clear-btn:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .option-label {
+            margin-right: 10px;
+            font-weight: 600;
+        }
+        
+        .option-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .option-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .status {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .status.valid {
+            display: block;
+            background-color: rgba(66, 184, 131, 0.1);
+            color: #2a9d6e;
+            border-left: 4px solid #42b883;
+        }
+        
+        .status.invalid {
+            display: block;
+            background-color: rgba(237, 85, 101, 0.1);
+            color: #e53e3e;
+            border-left: 4px solid #ed5565;
+        }
+        
+        .line-numbers {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 40px;
+            height: calc(100% - 30px);
+            padding: 0 8px;
+            font-family: 'MiSans', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: right;
+            color: #999;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .json-textarea-with-line-numbers {
+            padding-left: 50px;
+        }
+        
+        .footer {
+            background-color: var(--card-bg);
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+            margin-top: auto;
+        }
+        
+        .copyright {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .sample-json {
+            margin-top: 20px;
+        }
+        
+        .sample-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .sample-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .sample-link {
+            padding: 6px 12px;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .sample-link:hover {
+            background-color: rgba(67, 97, 238, 0.2);
+        }
+        
+        .json-viewer {
+            white-space: pre-wrap;
+            font-family: 'MiSans', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="../index.html" class="logo-container">
+                <img src="../img/logo.png" alt="Dreamirage Logo" class="logo">
+                <h1 class="title">JSON格式化工具</h1>
+            </a>
+            <a href="../index.html" class="home-btn">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2 class="card-title">JSON格式化工具</h2>
+                
+                <div class="action-buttons">
+                    <button class="btn" id="format-btn">
+                        <i class="fas fa-indent"></i> 格式化
+                    </button>
+                    <button class="btn" id="validate-btn">
+                        <i class="fas fa-check-circle"></i> 验证
+                    </button>
+                    <button class="btn secondary" id="minify-btn">
+                        <i class="fas fa-compress-alt"></i> 压缩
+                    </button>
+                    <button class="btn success" id="copy-btn">
+                        <i class="fas fa-copy"></i> 复制
+                    </button>
+                </div>
+                
+                <div class="options">
+                    <div class="option-group">
+                        <label class="option-label">缩进:</label>
+                        <select class="option-select" id="indent-select">
+                            <option value="2">2个空格</option>
+                            <option value="4" selected>4个空格</option>
+                            <option value="8">8个空格</option>
+                            <option value="tab">Tab</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="status" id="status"></div>
+                
+                <div class="textarea-container">
+                    <textarea class="code-area" id="json-input" placeholder='请在此处粘贴或输入JSON数据，例如：
+{
+    "name": "张三",
+    "age": 30,
+    "isActive": true,
+    "interests": ["编程", "阅读", "旅行"],
+    "address": {
+        "city": "北京",
+        "zipCode": "100000"
+    }
+}'></textarea>
+                    <button class="clear-btn" id="clear-btn" title="清空">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="sample-json">
+                    <h3 class="sample-title">示例:</h3>
+                    <div class="sample-links">
+                        <div class="sample-link" id="sample-simple">简单对象</div>
+                        <div class="sample-link" id="sample-array">数组对象</div>
+                        <div class="sample-link" id="sample-nested">嵌套对象</div>
+                        <div class="sample-link" id="sample-complex">复杂示例</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        <p class="copyright">© 2025 Dreamirage Tool - 版权所有 | 保留所有权利</p>
+    </footer>
+    
+    <script>
+        // DOM元素
+        const jsonInput = document.getElementById('json-input');
+        const formatBtn = document.getElementById('format-btn');
+        const validateBtn = document.getElementById('validate-btn');
+        const minifyBtn = document.getElementById('minify-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const indentSelect = document.getElementById('indent-select');
+        const statusDiv = document.getElementById('status');
+        
+        // 示例JSON
+        const sampleSimple = document.getElementById('sample-simple');
+        const sampleArray = document.getElementById('sample-array');
+        const sampleNested = document.getElementById('sample-nested');
+        const sampleComplex = document.getElementById('sample-complex');
+        
+        // 格式化JSON
+        formatBtn.addEventListener('click', () => {
+            const json = jsonInput.value.trim();
+            if (!json) {
+                showStatus('请输入JSON数据', false);
+                return;
+            }
+            
+            try {
+                const parsed = JSON.parse(json);
+                const indentVal = getIndentValue();
+                const formatted = JSON.stringify(parsed, null, indentVal);
+                jsonInput.value = formatted;
+                showStatus('JSON格式化成功！', true);
+            } catch (error) {
+                showStatus(`格式化失败: ${error.message}`, false);
+            }
+        });
+        
+        // 验证JSON
+        validateBtn.addEventListener('click', () => {
+            const json = jsonInput.value.trim();
+            if (!json) {
+                showStatus('请输入JSON数据', false);
+                return;
+            }
+            
+            try {
+                JSON.parse(json);
+                showStatus('验证成功！JSON格式有效。', true);
+            } catch (error) {
+                showStatus(`验证失败: ${error.message}`, false);
+            }
+        });
+        
+        // 压缩JSON
+        minifyBtn.addEventListener('click', () => {
+            const json = jsonInput.value.trim();
+            if (!json) {
+                showStatus('请输入JSON数据', false);
+                return;
+            }
+            
+            try {
+                const parsed = JSON.parse(json);
+                const minified = JSON.stringify(parsed);
+                jsonInput.value = minified;
+                showStatus('JSON压缩成功！', true);
+            } catch (error) {
+                showStatus(`压缩失败: ${error.message}`, false);
+            }
+        });
+        
+        // 复制JSON
+        copyBtn.addEventListener('click', () => {
+            const json = jsonInput.value.trim();
+            if (!json) {
+                showStatus('没有可复制的内容', false);
+                return;
+            }
+            
+            navigator.clipboard.writeText(json).then(() => {
+                showStatus('JSON已复制到剪贴板！', true);
+            }).catch(err => {
+                showStatus('复制失败，请手动复制', false);
+            });
+        });
+        
+        // 清空输入框
+        clearBtn.addEventListener('click', () => {
+            jsonInput.value = '';
+            statusDiv.style.display = 'none';
+        });
+        
+        // 显示状态信息
+        function showStatus(message, isValid) {
+            statusDiv.textContent = message;
+            statusDiv.className = isValid ? 'status valid' : 'status invalid';
+        }
+        
+        // 获取缩进值
+        function getIndentValue() {
+            const value = indentSelect.value;
+            return value === 'tab' ? '\t' : parseInt(value);
+        }
+        
+        // 示例JSON
+        sampleSimple.addEventListener('click', () => {
+            const simpleJson = {
+                "name": "张三",
+                "age": 30,
+                "isActive": true,
+                "email": "zhangsan@example.com"
+            };
+            jsonInput.value = JSON.stringify(simpleJson, null, 4);
+        });
+        
+        sampleArray.addEventListener('click', () => {
+            const arrayJson = {
+                "users": [
+                    {
+                        "id": 1,
+                        "name": "张三",
+                        "age": 30
+                    },
+                    {
+                        "id": 2,
+                        "name": "李四",
+                        "age": 25
+                    },
+                    {
+                        "id": 3,
+                        "name": "王五",
+                        "age": 28
+                    }
+                ]
+            };
+            jsonInput.value = JSON.stringify(arrayJson, null, 4);
+        });
+        
+        sampleNested.addEventListener('click', () => {
+            const nestedJson = {
+                "person": {
+                    "name": "张三",
+                    "age": 30,
+                    "address": {
+                        "street": "中关村大街1号",
+                        "city": "北京",
+                        "zipCode": "100000",
+                        "country": "中国"
+                    },
+                    "contact": {
+                        "email": "zhangsan@example.com",
+                        "phone": "13800138000"
+                    }
+                }
+            };
+            jsonInput.value = JSON.stringify(nestedJson, null, 4);
+        });
+        
+        sampleComplex.addEventListener('click', () => {
+            const complexJson = {
+                "company": {
+                    "name": "示例科技有限公司",
+                    "established": 2010,
+                    "active": true,
+                    "address": {
+                        "main": {
+                            "street": "科技园路88号",
+                            "city": "深圳",
+                            "province": "广东",
+                            "zipCode": "518000"
+                        },
+                        "branch": {
+                            "street": "中关村大街1号",
+                            "city": "北京",
+                            "zipCode": "100000"
+                        }
+                    },
+                    "employees": [
+                        {
+                            "id": "EMP001",
+                            "name": "张三",
+                            "position": "软件工程师",
+                            "department": "研发部",
+                            "skills": ["JavaScript", "Python", "React"],
+                            "contact": {
+                                "email": "zhangsan@example.com",
+                                "phone": "13800138000"
+                            }
+                        },
+                        {
+                            "id": "EMP002",
+                            "name": "李四",
+                            "position": "产品经理",
+                            "department": "产品部",
+                            "skills": ["产品设计", "用户研究", "项目管理"],
+                            "contact": {
+                                "email": "lisi@example.com",
+                                "phone": "13900139000"
+                            }
+                        },
+                        {
+                            "id": "EMP003",
+                            "name": "王五",
+                            "position": "UI设计师",
+                            "department": "设计部",
+                            "skills": ["UI设计", "Sketch", "Figma"],
+                            "contact": {
+                                "email": "wangwu@example.com",
+                                "phone": "13700137000"
+                            }
+                        }
+                    ],
+                    "products": [
+                        {
+                            "id": "PROD001",
+                            "name": "智能助手",
+                            "version": "2.0",
+                            "releaseDate": "2023-05-15",
+                            "price": 199.99,
+                            "features": ["语音识别", "智能推荐", "多语言支持"]
+                        },
+                        {
+                            "id": "PROD002",
+                            "name": "数据分析平台",
+                            "version": "1.5",
+                            "releaseDate": "2022-11-20",
+                            "price": 299.99,
+                            "features": ["实时分析", "自定义报表", "数据可视化"]
+                        }
+                    ]
+                }
+            };
+            jsonInput.value = JSON.stringify(complexJson, null, 4);
+        });
+        
+        // 自动格式化输入的JSON
+        jsonInput.addEventListener('blur', () => {
+            const json = jsonInput.value.trim();
+            if (json) {
+                try {
+                    const parsed = JSON.parse(json);
+                    const indentVal = getIndentValue();
+                    const formatted = JSON.stringify(parsed, null, indentVal);
+                    jsonInput.value = formatted;
+                    statusDiv.style.display = 'none';
+                } catch (error) {
+                    // 如果不是有效的JSON，不做处理
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

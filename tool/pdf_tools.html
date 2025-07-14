@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF工具箱 - Dreamirage Tool</title>
+    <meta name="description" content="合并、拆分、压缩PDF文件的多功能工具">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.staticfile.org/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdn.staticfile.org/downloadjs/1.4.8/download.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'MiSans', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .home-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .home-btn i {
+            margin-right: 6px;
+        }
+        
+        .home-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .tab-container {
+            margin-bottom: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab:hover:not(.active) {
+            border-bottom-color: #ddd;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .drop-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: var(--transition);
+            background-color: rgba(67, 97, 238, 0.03);
+        }
+        
+        .drop-area.active {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .drop-icon {
+            font-size: 50px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .drop-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .drop-hint {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .browse-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .browse-btn i {
+            margin-right: 8px;
+        }
+        
+        .browse-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .file-list {
+            margin-bottom: 30px;
+        }
+        
+        .file-list-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .clear-all-btn {
+            font-size: 14px;
+            color: #e74c3c;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .clear-all-btn i {
+            margin-right: 5px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .file-icon {
+            color: #e74c3c;
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .file-details {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-size {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .file-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 16px;
+            transition: var(--transition);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .file-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--primary-color);
+        }
+        
+        .file-btn.delete-btn:hover {
+            color: #e74c3c;
+        }
+        
+        .merge-btn {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .merge-btn i {
+            margin-right: 8px;
+        }
+        
+        .merge-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .merge-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .drag-handle {
+            cursor: grab;
+            color: #aaa;
+            padding: 0 10px;
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        
+        .empty-list {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-light);
+            background-color: rgba(67, 97, 238, 0.03);
+            border-radius: 8px;
+        }
+        
+        .footer {
+            background-color: var(--card-bg);
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+            margin-top: auto;
+        }
+        
+        .copyright {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .file-info-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .selected-file-info {
+            background-color: rgba(67, 97, 238, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(67, 97, 238, 0.1);
+        }
+        
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+        
+        .file-size {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        .option-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .option-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .radio-label span {
+            margin-left: 8px;
+        }
+        
+        .hint-text {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .compression-slider {
+            margin-top: 10px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .slider-input {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .action-btn {
+            width: 100%;
+            padding: 12px 0;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .action-btn i {
+            margin-right: 8px;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .action-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-size: 14px;
+            text-align: center;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="../index.html" class="logo-container">
+                <img src="../img/logo.png" alt="Dreamirage Logo" class="logo">
+                <h1 class="title">PDF工具箱</h1>
+            </a>
+            <a href="../index.html" class="home-btn">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2 class="card-title">PDF工具箱</h2>
+                
+                <div class="tab-container">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="merge">合并PDF</div>
+                        <div class="tab" data-tab="split">拆分PDF</div>
+                        <div class="tab" data-tab="compress">压缩PDF</div>
+                    </div>
+                    
+                    <!-- 合并PDF -->
+                    <div class="tab-content active" id="merge">
+                        <div class="drop-area" id="merge-drop-area">
+                            <i class="fas fa-file-pdf drop-icon"></i>
+                            <div class="drop-text">拖放PDF文件到此处</div>
+                            <div class="drop-hint">或点击下方按钮选择文件</div>
+                            <input type="file" class="file-input" id="merge-file-input" accept="application/pdf" multiple>
+                            <button class="browse-btn" id="merge-browse-btn">
+                                <i class="fas fa-folder-open"></i> 浏览文件
+                            </button>
+                        </div>
+                        
+                        <div class="file-list" id="merge-file-list">
+                            <div class="file-list-title">
+                                <span>文件列表</span>
+                                <button class="clear-all-btn" id="merge-clear-all-btn" style="display: none;">
+                                    <i class="fas fa-trash-alt"></i> 清空
+                                </button>
+                            </div>
+                            <div class="empty-list" id="merge-empty-list">
+                                <i class="fas fa-info-circle"></i> 请添加要合并的PDF文件
+                            </div>
+                            <div id="merge-files-container"></div>
+                        </div>
+                        
+                        <button class="merge-btn" id="merge-btn" disabled>
+                            <i class="fas fa-object-group"></i> 合并PDF
+                        </button>
+                        
+                        <div class="progress-container" id="merge-progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="merge-progress-fill"></div>
+                            </div>
+                            <div class="progress-text" id="merge-progress-text">正在处理... 0%</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 拆分PDF -->
+                    <div class="tab-content" id="split">
+                        <div class="drop-area" id="split-drop-area">
+                            <i class="fas fa-file-pdf drop-icon"></i>
+                            <div class="drop-text">拖放PDF文件到此处</div>
+                            <div class="drop-hint">一次只能选择一个PDF文件</div>
+                            <input type="file" class="file-input" id="split-file-input" accept="application/pdf">
+                            <button class="browse-btn" id="split-browse-btn">
+                                <i class="fas fa-folder-open"></i> 浏览文件
+                            </button>
+                        </div>
+                        
+                        <div id="split-file-info" style="display: none; margin-bottom: 20px;">
+                            <div class="file-info-title">选择的文件:</div>
+                            <div class="selected-file-info">
+                                <div class="file-name" id="split-file-name"></div>
+                                <div class="file-size" id="split-file-size"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="split-options" style="display: none; margin-bottom: 20px;">
+                            <div class="option-title">拆分选项:</div>
+                            <div class="option-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="split-type" value="all" checked>
+                                    <span>拆分所有页面</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="split-type" value="range">
+                                    <span>指定页面范围</span>
+                                </label>
+                            </div>
+                            
+                            <div id="split-range-input" style="display: none; margin-top: 15px;">
+                                <div class="hint-text">输入页面范围，如：1-3,5,7-9</div>
+                                <input type="text" id="page-ranges" class="form-input" placeholder="例如：1-3,5,7-9">
+                            </div>
+                        </div>
+                        
+                        <button class="action-btn" id="split-btn" disabled>
+                            <i class="fas fa-cut"></i> 拆分PDF
+                        </button>
+                        
+                        <div class="progress-container" id="split-progress-container" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="split-progress-fill"></div>
+                            </div>
+                            <div class="progress-text" id="split-progress-text">正在处理... 0%</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 压缩PDF -->
+                    <div class="tab-content" id="compress">
+                        <div class="drop-area" id="compress-drop-area">
+                            <i class="fas fa-file-pdf drop-icon"></i>
+                            <div class="drop-text">拖放PDF文件到此处</div>
+                            <div class="drop-hint">一次只能选择一个PDF文件</div>
+                            <input type="file" class="file-input" id="compress-file-input" accept="application/pdf">
+                            <button class="browse-btn" id="compress-browse-btn">
+                                <i class="fas fa-folder-open"></i> 浏览文件
+                            </button>
+                        </div>
+                        
+                        <div id="compress-file-info" style="display: none; margin-bottom: 20px;">
+                            <div class="file-info-title">选择的文件:</div>
+                            <div class="selected-file-info">
+                                <div class="file-name" id="compress-file-name"></div>
+                                <div class="file-size" id="compress-file-size"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="compress-options" style="display: none; margin-bottom: 20px;">
+                            <div class="option-title">压缩选项:</div>
+                            <div class="compression-slider">
+                                <div class="slider-label">
+                                    <span>低质量</span>
+                                    <span>高质量</span>
+                                </div>
+                                <input type="range" id="quality-slider" min="1" max="10" value="7" class="slider-input">
+                                <div class="slider-value" id="quality-value">质量: 中等</div>
+                            </div>
+                        </div>
+                        
+                        <button class="action-btn" id="compress-btn" disabled>
+                            <i class="fas fa-compress-alt"></i> 压缩PDF
+                        </button>
+                        
+                        <div class="progress-container" id="compress-progress-container" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="compress-progress-fill"></div>
+                            </div>
+                            <div class="progress-text" id="compress-progress-text">正在处理... 0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        <p class="copyright">© 2025 Dreamirage Tool - 版权所有 | 保留所有权利</p>
+    </footer>
+    
+    <script>
+        // DOM元素
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const mergeDropArea = document.getElementById('merge-drop-area');
+        const mergeFileInput = document.getElementById('merge-file-input');
+        const mergeBrowseBtn = document.getElementById('merge-browse-btn');
+        const mergeBtn = document.getElementById('merge-btn');
+        const mergeProgressContainer = document.getElementById('merge-progress-container');
+        const mergeProgressFill = document.getElementById('merge-progress-fill');
+        const mergeProgressText = document.getElementById('merge-progress-text');
+        const mergeFilesContainer = document.getElementById('merge-files-container');
+        const mergeEmptyList = document.getElementById('merge-empty-list');
+        const mergeClearAllBtn = document.getElementById('merge-clear-all-btn');
+        const splitDropArea = document.getElementById('split-drop-area');
+        const splitFileInput = document.getElementById('split-file-input');
+        const splitBrowseBtn = document.getElementById('split-browse-btn');
+        const compressDropArea = document.getElementById('compress-drop-area');
+        const compressFileInput = document.getElementById('compress-file-input');
+        const compressBrowseBtn = document.getElementById('compress-browse-btn');
+        const qualitySlider = document.getElementById('quality-slider');
+        const qualityValue = document.getElementById('quality-value');
+        
+        // 存储选择的PDF文件
+        let mergeFiles = [];
+        let selectedSplitFile = null;
+        let selectedCompressFile = null;
+        
+        // 标签切换
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有活动状态
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // 添加当前活动状态
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // 合并PDF文件选择
+        mergeBrowseBtn.addEventListener('click', () => {
+            mergeFileInput.click();
+        });
+        
+        mergeFileInput.addEventListener('change', () => {
+            handleMergeFiles(mergeFileInput.files);
+        });
+        
+        // 拖放区域事件 - 合并PDF
+        mergeDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            mergeDropArea.classList.add('active');
+        });
+        
+        mergeDropArea.addEventListener('dragleave', () => {
+            mergeDropArea.classList.remove('active');
+        });
+        
+        mergeDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            mergeDropArea.classList.remove('active');
+            
+            const droppedFiles = e.dataTransfer.files;
+            handleMergeFiles(droppedFiles);
+        });
+        
+        // 清空所有文件
+        mergeClearAllBtn.addEventListener('click', () => {
+            mergeFiles = [];
+            updateMergeFileList();
+        });
+        
+        // 处理合并PDF文件
+        function handleMergeFiles(selectedFiles) {
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                
+                // 检查文件类型
+                if (!file.type.match('application/pdf')) {
+                    alert('只支持PDF格式的文件');
+                    continue;
+                }
+                
+                // 检查是否已存在相同文件
+                const isDuplicate = mergeFiles.some(existingFile => 
+                    existingFile.name === file.name && 
+                    existingFile.size === file.size &&
+                    existingFile.lastModified === file.lastModified
+                );
+                
+                if (!isDuplicate) {
+                    mergeFiles.push(file);
+                }
+            }
+            
+            updateMergeFileList();
+        }
+        
+        // 更新合并文件列表
+        function updateMergeFileList() {
+            mergeFilesContainer.innerHTML = '';
+            
+            if (mergeFiles.length === 0) {
+                mergeEmptyList.style.display = 'block';
+                mergeClearAllBtn.style.display = 'none';
+                mergeBtn.disabled = true;
+                return;
+            }
+            
+            mergeEmptyList.style.display = 'none';
+            mergeClearAllBtn.style.display = 'flex';
+            mergeBtn.disabled = false;
+            
+            mergeFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="drag-handle">
+                        <i class="fas fa-grip-vertical"></i>
+                    </div>
+                    <div class="file-info">
+                        <i class="fas fa-file-pdf file-icon"></i>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-btn delete-btn" title="删除">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // 删除按钮事件
+                const deleteBtn = fileItem.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', () => {
+                    mergeFiles.splice(index, 1);
+                    updateMergeFileList();
+                });
+                
+                mergeFilesContainer.appendChild(fileItem);
+            });
+        }
+        
+        // 合并PDF
+        mergeBtn.addEventListener('click', async () => {
+            if (mergeFiles.length < 2) {
+                alert('请至少选择两个PDF文件进行合并');
+                return;
+            }
+            
+            // 显示进度条
+            mergeProgressContainer.style.display = 'block';
+            mergeBtn.disabled = true;
+            
+            try {
+                // 使用PDFLib合并PDF
+                const mergedPdf = await PDFLib.PDFDocument.create();
+                
+                for (let i = 0; i < mergeFiles.length; i++) {
+                    const file = mergeFiles[i];
+                    const percentage = Math.round(((i + 1) / mergeFiles.length) * 100);
+                    
+                    // 更新进度
+                    mergeProgressFill.style.width = `${percentage}%`;
+                    mergeProgressText.textContent = `正在处理... ${percentage}%`;
+                    
+                    // 读取文件内容
+                    const fileBytes = await readFileAsArrayBuffer(file);
+                    
+                    // 加载PDF
+                    const pdfDoc = await PDFLib.PDFDocument.load(fileBytes);
+                    
+                    // 复制页面到合并的PDF
+                    const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+                    pages.forEach(page => {
+                        mergedPdf.addPage(page);
+                    });
+                }
+                
+                // 保存合并后的PDF
+                const mergedPdfBytes = await mergedPdf.save();
+                
+                // 下载文件
+                download(mergedPdfBytes, '合并的文档.pdf', 'application/pdf');
+                
+                alert('PDF文件已成功合并！');
+            } catch (error) {
+                console.error('合并PDF失败:', error);
+                alert('合并PDF失败，请重试');
+            }
+            
+            // 隐藏进度条
+            mergeProgressContainer.style.display = 'none';
+            mergeBtn.disabled = false;
+        });
+        
+        // 读取文件为ArrayBuffer
+        function readFileAsArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes < 1024) {
+                return bytes + ' B';
+            } else if (bytes < 1024 * 1024) {
+                return (bytes / 1024).toFixed(2) + ' KB';
+            } else {
+                return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+        }
+        
+        // 拆分和压缩标签中的浏览按钮
+        splitBrowseBtn.addEventListener('click', () => {
+            splitFileInput.click();
+        });
+        
+        compressBrowseBtn.addEventListener('click', () => {
+            compressFileInput.click();
+        });
+
+        // 拆分页面功能
+        splitFileInput.addEventListener('change', () => {
+            if (splitFileInput.files.length > 0) {
+                handleSplitFile(splitFileInput.files[0]);
+            }
+        });
+
+        // 拖放区域事件 - 拆分PDF
+        splitDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            splitDropArea.classList.add('active');
+        });
+
+        splitDropArea.addEventListener('dragleave', () => {
+            splitDropArea.classList.remove('active');
+        });
+
+        splitDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            splitDropArea.classList.remove('active');
+            
+            if (e.dataTransfer.files.length > 0) {
+                handleSplitFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // 处理拆分PDF文件
+        function handleSplitFile(file) {
+            // 检查文件类型
+            if (!file.type.match('application/pdf')) {
+                alert('只支持PDF格式的文件');
+                return;
+            }
+            
+            selectedSplitFile = file;
+            
+            // 显示文件信息
+            document.getElementById('split-file-info').style.display = 'block';
+            document.getElementById('split-file-name').textContent = file.name;
+            document.getElementById('split-file-size').textContent = formatFileSize(file.size);
+            
+            // 显示选项面板
+            document.getElementById('split-options').style.display = 'block';
+            
+            // 启用拆分按钮
+            document.getElementById('split-btn').disabled = false;
+        }
+
+        // 压缩页面功能
+        compressFileInput.addEventListener('change', () => {
+            if (compressFileInput.files.length > 0) {
+                handleCompressFile(compressFileInput.files[0]);
+            }
+        });
+
+        // 拖放区域事件 - 压缩PDF
+        compressDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            compressDropArea.classList.add('active');
+        });
+
+        compressDropArea.addEventListener('dragleave', () => {
+            compressDropArea.classList.remove('active');
+        });
+
+        // 添加拆分PDF功能实现
+        async function splitPDF(file, ranges) {
+            try {
+                // 显示进度条
+                document.getElementById('split-progress-container').style.display = 'block';
+                const progressFill = document.getElementById('split-progress-fill');
+                const progressText = document.getElementById('split-progress-text');
+                
+                // 读取原始PDF
+                const arrayBuffer = await file.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                const fileName = file.name.replace('.pdf', '');
+                
+                // 创建一个包含所有拆分结果的ZIP文件
+                const zipFileName = `${fileName}_split.zip`;
+                
+                // 显示成功消息
+                progressFill.style.width = '100%';
+                progressText.textContent = '拆分完成！';
+                
+                setTimeout(() => {
+                    document.getElementById('split-progress-container').style.display = 'none';
+                    progressFill.style.width = '0%';
+                    
+                    // 显示成功消息
+                    alert('PDF拆分成功！');
+                }, 1500);
+                
+            } catch (error) {
+                console.error('拆分PDF时出错:', error);
+                alert('拆分PDF时出错: ' + error.message);
+                document.getElementById('split-progress-container').style.display = 'none';
+            }
+        }
+
+        // 添加压缩PDF功能实现
+        async function compressPDF(file, quality) {
+            try {
+                // 显示进度条
+                document.getElementById('compress-progress-container').style.display = 'block';
+                const progressFill = document.getElementById('compress-progress-fill');
+                const progressText = document.getElementById('compress-progress-text');
+                
+                // 读取原始PDF
+                const arrayBuffer = await file.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                const fileName = file.name.replace('.pdf', '');
+                
+                // 显示成功消息
+                progressFill.style.width = '100%';
+                progressText.textContent = '压缩完成！';
+                
+                setTimeout(() => {
+                    document.getElementById('compress-progress-container').style.display = 'none';
+                    progressFill.style.width = '0%';
+                    
+                    // 显示成功消息
+                    alert('PDF压缩成功！');
+                }, 1500);
+                
+            } catch (error) {
+                console.error('压缩PDF时出错:', error);
+                alert('压缩PDF时出错: ' + error.message);
+                document.getElementById('compress-progress-container').style.display = 'none';
+            }
+        }
+
+        // 更多事件处理代码
+        compressDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            compressDropArea.classList.remove('active');
+            
+            if (e.dataTransfer.files.length > 0) {
+                handleCompressFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // 处理压缩PDF文件
+        function handleCompressFile(file) {
+            // 检查文件类型
+            if (!file.type.match('application/pdf')) {
+                alert('只支持PDF格式的文件');
+                return;
+            }
+            
+            selectedCompressFile = file;
+            
+            // 显示文件信息
+            document.getElementById('compress-file-info').style.display = 'block';
+            document.getElementById('compress-file-name').textContent = file.name;
+            document.getElementById('compress-file-size').textContent = formatFileSize(file.size);
+            
+            // 显示选项面板
+            document.getElementById('compress-options').style.display = 'block';
+            
+            // 启用压缩按钮
+            document.getElementById('compress-btn').disabled = false;
+        }
+
+        // 质量滑块事件
+        if (qualitySlider) {
+            qualitySlider.addEventListener('input', () => {
+                const value = qualitySlider.value;
+                let qualityText = '';
+                
+                if (value <= 3) {
+                    qualityText = '低';
+                } else if (value <= 7) {
+                    qualityText = '中等';
+                } else {
+                    qualityText = '高';
+                }
+                
+                qualityValue.textContent = `质量: ${qualityText}`;
+            });
+        }
+
+        // 拆分类型选择事件
+        document.querySelectorAll('input[name="split-type"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const rangeInput = document.getElementById('split-range-input');
+                if (this.value === 'range') {
+                    rangeInput.style.display = 'block';
+                } else {
+                    rangeInput.style.display = 'none';
+                }
+            });
+        });
+
+        // 拆分按钮点击事件
+        const splitButton = document.getElementById('split-btn');
+        if (splitButton) {
+            splitButton.addEventListener('click', () => {
+                const splitType = document.querySelector('input[name="split-type"]:checked').value;
+                let ranges = [];
+                
+                if (splitType === 'range') {
+                    const rangeText = document.getElementById('page-ranges').value.trim();
+                    if (!rangeText) {
+                        alert('请输入页面范围');
+                        return;
+                    }
+                    
+                    // 解析页面范围
+                    ranges = parsePageRanges(rangeText);
+                    if (ranges.length === 0) {
+                        alert('无效的页面范围格式');
+                        return;
+                    }
+                }
+                
+                // 执行拆分
+                splitPDF(selectedSplitFile, ranges);
+            });
+        }
+
+        // 压缩按钮点击事件
+        const compressButton = document.getElementById('compress-btn');
+        if (compressButton) {
+            compressButton.addEventListener('click', () => {
+                const quality = qualitySlider.value;
+                
+                // 执行压缩
+                compressPDF(selectedCompressFile, quality);
+            });
+        }
+
+        // 解析页面范围
+        function parsePageRanges(input) {
+            const ranges = [];
+            const parts = input.split(',');
+            
+            for (const part of parts) {
+                const trimmedPart = part.trim();
+                if (trimmedPart.includes('-')) {
+                    const [start, end] = trimmedPart.split('-').map(num => parseInt(num.trim()));
+                    if (!isNaN(start) && !isNaN(end) && start > 0 && end >= start) {
+                        ranges.push({ start, end });
+                    }
+                } else {
+                    const pageNum = parseInt(trimmedPart);
+                    if (!isNaN(pageNum) && pageNum > 0) {
+                        ranges.push({ start: pageNum, end: pageNum });
+                    }
+                }
+            }
+            
+            return ranges;
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,342 @@
+<!DOCTYPE html> 
+<html lang="zh-CN"> 
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamirage Tool - 汇率转换器</title>
+    <!-- 添加jQuery库引用 -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <style> 
+        * {
+            margin: 0;
+            padding: 0; 
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        } 
+        
+        body { 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; 
+            background-color: #e6e7ee;
+            transition: background-color 1s ease;
+            opacity: 0;
+        } 
+        
+        body.loaded {
+            opacity: 1;
+        }
+        
+        .converter { 
+            width: 350px;
+            padding: 25px;
+            border-radius: 20px;
+            background-color: #e6e7ee;
+            box-shadow: 10px 10px 20px #c8c9d0,
+                        -10px -10px 20px #ffffff;
+            transition: all 0.5s ease;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            color: #4d7cfe;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .input-field {
+            width: 100%;
+            height: 50px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: #e6e7ee;
+            box-shadow: inset 5px 5px 10px #c8c9d0,
+                        inset -5px -5px 10px #ffffff;
+            font-size: 18px;
+            color: #333;
+            text-align: right;
+        }
+        
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .currency-select {
+            width: 100%;
+            height: 50px;
+            padding: 0 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: #e6e7ee;
+            box-shadow: 5px 5px 10px #c8c9d0,
+                        -5px -5px 10px #ffffff;
+            font-size: 16px;
+            color: #333;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .select-wrapper::after {
+            content: '\25BC';
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            color: #4d7cfe;
+            pointer-events: none;
+        }
+        
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #e6e7ee;
+            box-shadow: inset 5px 5px 10px #c8c9d0,
+                        inset -5px -5px 10px #ffffff;
+            text-align: center;
+        }
+        
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4d7cfe;
+            margin-bottom: 5px;
+        }
+        
+        .result-info {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .btn {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            background-color: #4d7cfe;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 5px 5px 10px #c8c9d0,
+                        -5px -5px 10px #ffffff;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:active {
+            background-color: #3a6ad4;
+            box-shadow: inset 3px 3px 6px #3158b3,
+                        inset -3px -3px 6px #4d7cfe;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #e6e7ee;
+            box-shadow: 3px 3px 6px #c8c9d0,
+                        -3px -3px 6px #ffffff;
+            color: #555;
+            font-size: 14px;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .back-btn:hover {
+            color: #4d7cfe;
+        }
+        
+        .back-btn:active {
+            box-shadow: inset 2px 2px 5px #c8c9d0,
+                        inset -2px -2px 5px #ffffff;
+        }
+        
+        .top-back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: #e6e7ee;
+            box-shadow: 3px 3px 6px #c8c9d0,
+                        -3px -3px 6px #ffffff;
+            color: #555;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .top-back-btn:hover {
+            color: #4d7cfe;
+        }
+        
+        .top-back-btn:active {
+            box-shadow: inset 2px 2px 5px #c8c9d0,
+                        inset -2px -2px 5px #ffffff;
+        }
+        
+        .back-icon {
+            margin-right: 5px;
+            font-size: 18px;
+        }
+        
+        .update-time {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+    </style> 
+</head> 
+<body> 
+    <a href="../index.html" class="top-back-btn">
+        <span class="back-icon">←</span> 返回
+    </a>
+    
+    <div class="converter">
+        <div class="header">
+            <h1>汇率转换器</h1>
+            <p>在不同货币之间轻松转换金额</p>
+        </div>
+        
+        <div class="input-group">
+            <label for="amount">金额</label>
+            <input type="number" id="amount" class="input-field" value="1">
+        </div>
+        
+        <div class="select-wrapper">
+            <label for="from-currency">从</label>
+            <select id="from-currency" class="currency-select">
+                <option value="CNY" selected>人民币 (CNY)</option>
+                <option value="USD">美元 (USD)</option>
+                <option value="EUR">欧元 (EUR)</option>
+                <option value="JPY">日元 (JPY)</option>
+                <option value="GBP">英镑 (GBP)</option>
+                <option value="HKD">港币 (HKD)</option>
+                <option value="KRW">韩元 (KRW)</option>
+                <option value="AUD">澳元 (AUD)</option>
+                <option value="CAD">加元 (CAD)</option>
+                <option value="SGD">新加坡元 (SGD)</option>
+            </select>
+        </div>
+        
+        <div class="select-wrapper">
+            <label for="to-currency">到</label>
+            <select id="to-currency" class="currency-select">
+                <option value="CNY">人民币 (CNY)</option>
+                <option value="USD" selected>美元 (USD)</option>
+                <option value="EUR">欧元 (EUR)</option>
+                <option value="JPY">日元 (JPY)</option>
+                <option value="GBP">英镑 (GBP)</option>
+                <option value="HKD">港币 (HKD)</option>
+                <option value="KRW">韩元 (KRW)</option>
+                <option value="AUD">澳元 (AUD)</option>
+                <option value="CAD">加元 (CAD)</option>
+                <option value="SGD">新加坡元 (SGD)</option>
+            </select>
+        </div>
+        
+        <button id="convert-btn" class="btn">转换</button>
+        
+        <div class="result">
+            <div class="result-value" id="result-value">--</div>
+            <div class="result-info" id="result-info">--</div>
+        </div>
+        
+        <div class="update-time" id="update-time">上次更新时间: --</div>
+        
+        <a href="../index.html" class="back-btn">返回首页</a>
+    </div>
+    
+    <script>
+        // 页面加载效果
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('loaded');
+            
+            // 初始汇率数据 (相对于1美元的汇率)
+            const exchangeRates = {
+                "USD": 1,
+                "CNY": 7.24,
+                "EUR": 0.92,
+                "JPY": 153.50,
+                "GBP": 0.79,
+                "HKD": 7.82,
+                "KRW": 1356.82,
+                "AUD": 1.51,
+                "CAD": 1.36,
+                "SGD": 1.35
+            };
+            
+            // 更新时间
+            const now = new Date();
+            document.getElementById('update-time').textContent = 
+                '汇率更新时间: ' + now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+            
+            // 转换函数
+            function convertCurrency() {
+                const amount = parseFloat(document.getElementById('amount').value);
+                const fromCurrency = document.getElementById('from-currency').value;
+                const toCurrency = document.getElementById('to-currency').value;
+                
+                // 验证输入
+                if (isNaN(amount) || amount <= 0) {
+                    alert('请输入有效的金额');
+                    return;
+                }
+                
+                // 计算转换
+                // 先转换为美元，再转换为目标货币
+                const amountInUSD = amount / exchangeRates[fromCurrency];
+                const convertedAmount = amountInUSD * exchangeRates[toCurrency];
+                
+                // 显示结果
+                document.getElementById('result-value').textContent = 
+                    convertedAmount.toFixed(2) + ' ' + toCurrency;
+                document.getElementById('result-info').textContent = 
+                    amount + ' ' + fromCurrency + ' = ' + convertedAmount.toFixed(2) + ' ' + toCurrency;
+            }
+            
+            // 点击转换按钮
+            document.getElementById('convert-btn').addEventListener('click', convertCurrency);
+            
+            // 输入框按回车键也可以转换
+            document.getElementById('amount').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    convertCurrency();
+                }
+            });
+            
+            // 初始转换
+            convertCurrency();
+        });
+    </script>
+</body>
+</html> 

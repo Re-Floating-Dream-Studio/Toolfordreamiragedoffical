@@ -1,0 +1,2321 @@
+<!DOCTYPE html> 
+<html lang="zh-CN"> 
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamirage Tool - 计算器</title>
+    <!-- 添加jQuery库引用 -->
+    <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <style> 
+        * {
+            margin: 0;
+            padding: 0; 
+            box-sizing: border-box;
+            font-family: 'MiSans', 'Arial', sans-serif;
+        } 
+        
+        body { 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; 
+            background-color: #e6e7ee;
+            transition: background-color 1s ease;
+            opacity: 0;
+        } 
+        
+        body.loaded {
+            opacity: 1;
+        }
+        
+        .calculator { 
+            width: 350px;
+            padding: 25px;
+            border-radius: 20px;
+            background-color: #e6e7ee;
+            box-shadow: 10px 10px 20px #c8c9d0,
+                        -10px -10px 20px #ffffff;
+            transition: all 0.5s ease;
+        }
+        
+        .display { 
+            width: 100%; 
+            height: 80px;
+            margin-bottom: 20px; 
+            padding: 15px;
+            border-radius: 10px; 
+            background-color: #e6e7ee;
+            box-shadow: inset 5px 5px 10px #c8c9d0,
+                        inset -5px -5px 10px #ffffff; 
+            text-align: right;
+            overflow: hidden;
+        } 
+        
+        .history {
+            height: 20px;
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 5px;
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
+        }
+        
+        .current {
+            height: 40px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+         
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+         
+        .btn {
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            background-color: #e6e7ee; 
+            box-shadow: 5px 5px 10px #c8c9d0,
+                        -5px -5px 10px #ffffff;
+            font-size: 18px;
+            color: #333;
+            cursor: pointer; 
+            transition: all 0.2s ease;
+        } 
+        
+        .btn:active {
+            box-shadow: inset 3px 3px 6px #c8c9d0, 
+                        inset -3px -3px 6px #ffffff; 
+        } 
+        
+        .btn-operator {
+            color: #4d7cfe;
+            font-weight: bold;
+        } 
+        
+        .btn-function {
+            color: #ff7043;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .btn-equal {
+            background-color: #4d7cfe;
+            color: white;
+            box-shadow: 5px 5px 10px #c8c9d0,
+                        -5px -5px 10px #ffffff; 
+        }
+         
+        .btn-equal:active {
+            background-color: #3a6ad4;
+            box-shadow: inset 3px 3px 6px #3158b3,
+                        inset -3px -3px 6px #4d7cfe; 
+        } 
+        
+        .btn-clear { 
+            color: #ff5252;
+            font-weight: bold;
+        }
+         
+        .mode-switch { 
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+         
+        .mode-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #e6e7ee; 
+            box-shadow: 3px 3px 6px #c8c9d0, 
+                        -3px -3px 6px #ffffff;
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s ease; 
+        }
+         
+        .mode-btn.active  {
+            box-shadow: inset 2px 2px 5px #c8c9d0,
+                        inset -2px -2px 5px #ffffff;
+            color: #4d7cfe; 
+            font-weight: bold;
+        }
+        
+        /* 设置按钮样式 */
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background-color: rgba(120, 130, 140, 0.7); /* 修改为与返回按钮一致的灰色调 */
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            color: #ffffff; /* 图标改为白色 */
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border: 1px solid rgba(200, 210, 220, 0.3);
+        }
+        
+        .settings-btn:hover {
+            background-color: rgba(100, 110, 120, 0.8);
+        }
+        
+        .settings-btn:active {
+            box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 动态改变设置按钮颜色以适应主题 */
+        body.dark-mode .settings-btn {
+            background-color: rgba(50, 60, 70, 0.8);
+            color: #63b3ed; /* 改为蓝色调 */
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(70, 80, 100, 0.3);
+        }
+        
+        /* 动态改变设置按钮颜色以适应主题 */
+        body.rain-theme .settings-btn {
+            background-color: rgba(30, 40, 50, 0.6);
+            color: #a0c8ff;
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(100, 150, 200, 0.2);
+        }
+        
+        /* 动态改变设置按钮颜色以适应主题 */
+        body.sanye-theme .settings-btn {
+            background-color: rgba(30, 30, 30, 0.4);
+            color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 设置面板样式 */
+        .settings-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 90%;
+            max-width: 400px;
+            background-color: #e6e7ee;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+            overflow: hidden;
+        }
+        
+        .settings-panel.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .settings-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 20px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: #555;
+        }
+        
+        .settings-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #777;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .tab-btn.active {
+            color: #4d7cfe;
+            font-weight: bold;
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #4d7cfe;
+        }
+        
+        /* 表单元素样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: #e6e7ee;
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .switch-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e6e7ee;
+            box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        input:checked + .slider {
+            background-color: #4d7cfe;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* 遮罩层 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* 黑暗主题 */
+        body.dark-mode {
+            background-color: #2d3748;
+        }
+        
+        body.dark-mode .calculator {
+            background-color: rgba(45, 55, 72, 0.9);
+            box-shadow: 7px 7px 14px rgba(0, 0, 0, 0.3),
+                        -7px -7px 14px rgba(70, 80, 100, 0.1);
+            animation: fadeIn 0.8s ease;
+            transform-origin: center center;
+            border: 1px solid rgba(70, 80, 100, 0.2);
+        }
+        
+        body.dark-mode .display {
+            background-color: #2d3748;
+            box-shadow: inset 5px 5px 10px #1a202c,
+                        inset -5px -5px 10px #3a4a63;
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .current {
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .history {
+            color: #a0aec0;
+        }
+        
+        body.dark-mode .btn,
+        body.dark-mode .mode-btn {
+            background-color: #2d3748;
+            box-shadow: 5px 5px 10px #1a202c,
+                        -5px -5px 10px #3a4a63;
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .btn:active,
+        body.dark-mode .mode-btn.active {
+            box-shadow: inset 3px 3px 6px #1a202c,
+                        inset -3px -3px 6px #3a4a63;
+        }
+        
+        body.dark-mode .btn-operator {
+            color: #63b3ed;
+        }
+        
+        body.dark-mode .btn-function {
+            color: #f6ad55;
+        }
+        
+        body.dark-mode .btn-clear {
+            color: #fc8181;
+        }
+        
+        body.dark-mode .btn-equal {
+            background-color: #4299e1;
+        }
+        
+        body.dark-mode .settings-panel {
+            background-color: #2d3748;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        body.dark-mode .settings-header h2,
+        body.dark-mode .tab-btn.active {
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .close-btn,
+        body.dark-mode .tab-btn {
+            color: #a0aec0;
+        }
+        
+        body.dark-mode .form-group label {
+            color: #cbd5e0;
+        }
+        
+        body.dark-mode .form-group input[type="number"] {
+            background-color: #2d3748;
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.2);
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .slider {
+            background-color: #2d3748;
+            box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 雨天主题 */
+        body.rain-theme {
+            background-color: #050d19;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 1s ease;
+        }
+        
+        /* 三叶主题 */
+        body.sanye-theme {
+            background-color: #0a1a0f;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 1s ease;
+        }
+
+        /* 视频背景 */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: -1;
+        }
+        
+        body.rain-theme .video-background.rain {
+            opacity: 0.85;
+        }
+        
+        body.sanye-theme .video-background.sanye {
+            opacity: 0.9;
+        }
+        
+        body.rain-theme .calculator {
+            background-color: rgba(20, 30, 45, 0.65);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(100, 150, 200, 0.25);
+            animation: fadeIn 0.8s ease;
+            transform-origin: center center;
+        }
+        
+        body.rain-theme .display {
+            background-color: rgba(15, 25, 40, 0.7);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+            color: #a0c8ff;
+            border: 1px solid rgba(100, 150, 200, 0.25);
+            backdrop-filter: blur(5px);
+        }
+        
+        body.rain-theme .current {
+            color: #d0e8ff;
+            text-shadow: 0 0 5px rgba(150, 200, 255, 0.5);
+        }
+        
+        body.rain-theme .history {
+            color: #80a0c0;
+        }
+        
+        body.rain-theme .btn {
+            background-color: rgba(40, 60, 80, 0.7);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            color: #c0d8f0;
+            border: 1px solid rgba(100, 150, 200, 0.2);
+        }
+        
+        body.rain-theme .btn:active {
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        body.rain-theme .btn-operator {
+            color: #80c0ff;
+        }
+        
+        body.rain-theme .btn-function {
+            color: #a0c0ff;
+        }
+        
+        body.rain-theme .btn-equal {
+            background-color: rgba(60, 100, 150, 0.8);
+            color: #e0f0ff;
+        }
+        
+        body.rain-theme .mode-btn {
+            background-color: rgba(40, 60, 80, 0.7);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            color: #a0c0e0;
+        }
+        
+        body.rain-theme .mode-btn.active {
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+            color: #90c8ff;
+        }
+        
+        body.rain-theme .settings-panel {
+            background-color: rgba(30, 40, 50, 0.8);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(100, 150, 200, 0.2);
+        }
+        
+        body.rain-theme .settings-header h2 {
+            color: #d0e0f0;
+        }
+        
+        body.rain-theme .close-btn {
+            color: #a0b0c0;
+        }
+        
+        body.rain-theme .tab-btn {
+            color: #90a0b0;
+        }
+        
+        body.rain-theme .tab-btn.active {
+            color: #a0c8ff;
+        }
+        
+        body.rain-theme .form-group label {
+            color: #b0c0d0;
+        }
+        
+        body.rain-theme .form-group input[type="number"] {
+            background-color: rgba(40, 50, 60, 0.7);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+            color: #d0e0f0;
+            border: 1px solid rgba(100, 150, 200, 0.2);
+        }
+        
+        /* 主题选择样式 */
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .theme-option {
+            position: relative;
+            height: 80px;
+            border-radius: 10px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .theme-option.selected {
+            border-color: #4d7cfe;
+        }
+        
+        .theme-option:hover {
+            transform: translateY(-2px);
+        }
+        
+        .theme-light {
+            background-color: #e6e7ee;
+        }
+        
+        .theme-dark {
+            background-color: #2d3748;
+        }
+        
+        .theme-rain {
+            background: linear-gradient(rgba(19, 30, 59, 0.7), rgba(10, 20, 40, 0.8));
+            position: relative;
+        }
+        
+        .theme-rain::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 10, 30, 0.3), rgba(0, 15, 40, 0.3));
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .theme-name {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 12px;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 3;
+        }
+        
+        .theme-dark .theme-name {
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        .theme-rain .theme-name {
+            color: #d0e0f0;
+            background-color: rgba(0, 20, 40, 0.5);
+        }
+        
+        .theme-sanye {
+            background: linear-gradient(rgba(10, 40, 20, 0.7), rgba(5, 30, 15, 0.8));
+            position: relative;
+        }
+        
+        .theme-sanye::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(5, 25, 15, 0.3), rgba(10, 35, 20, 0.3));
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .theme-sanye .theme-name {
+            color: #d0ffe0;
+            background-color: rgba(0, 40, 20, 0.5);
+        }
+        
+        .theme-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        
+        /* 添加淡入效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* 主题变化时的整体过渡 */
+        body {
+            transition: background-color 1s ease;
+        }
+        
+        /* 默认主题计算器阴影优化 */
+        body:not(.dark-mode):not(.rain-theme):not(.sanye-theme) .calculator {
+            box-shadow: 7px 7px 14px rgba(200, 201, 208, 0.7),
+                        -7px -7px 14px rgba(255, 255, 255, 0.7);
+        }
+        
+        /* 视频主题共同样式 */
+        body.rain-theme .btn, body.sanye-theme .btn {
+            transition: all 0.3s ease;
+        }
+        
+        body.rain-theme .btn:hover, body.sanye-theme .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* 光照效果 */
+        body.rain-theme::before, body.sanye-theme::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                                        rgba(255, 255, 255, 0.1) 0%, 
+                                        rgba(0, 0, 0, 0) 50%);
+            z-index: 0;
+            opacity: 0.4;
+        }
+        
+        body.sanye-theme .calculator {
+            background-color: rgba(30, 30, 30, 0.25);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeIn 0.8s ease;
+            transform-origin: center center;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+        
+        body.sanye-theme .display {
+            background-color: rgba(20, 20, 20, 0.3);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.15);
+            color: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+        }
+        
+        body.sanye-theme .current {
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+        
+        body.sanye-theme .history {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        body.sanye-theme .btn {
+            background-color: rgba(40, 40, 40, 0.3);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        body.sanye-theme .btn:hover {
+            transform: translateY(-2px);
+            background-color: rgba(60, 60, 60, 0.4);
+        }
+        
+        body.sanye-theme .btn:active {
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.15);
+            transform: translateY(0);
+        }
+        
+        body.sanye-theme .btn-operator {
+            color: rgba(150, 220, 255, 0.95);
+            background-color: rgba(30, 30, 30, 0.35);
+        }
+        
+        body.sanye-theme .btn-function {
+            color: rgba(255, 200, 150, 0.95);
+            background-color: rgba(30, 30, 30, 0.35);
+        }
+        
+        body.sanye-theme .btn-equal {
+            background-color: rgba(60, 100, 170, 0.5);
+            color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.sanye-theme .btn-equal:active {
+            background-color: rgba(50, 90, 160, 0.6);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.sanye-theme .mode-btn {
+            background-color: rgba(30, 30, 30, 0.3);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(5px);
+        }
+        
+        body.sanye-theme .mode-btn.active {
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.15);
+            color: rgba(150, 220, 255, 0.95);
+            background-color: rgba(40, 40, 40, 0.5);
+        }
+        
+        /* 视频主题美化样式 */
+        body.sanye-theme::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, 
+                                        transparent, 
+                                        rgba(0, 0, 0, 0.3));
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* 添加光晕效果 */
+        body.sanye-theme .calculator::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: radial-gradient(circle at center, 
+                                        rgba(255, 255, 255, 0.1), 
+                                        transparent 70%);
+            z-index: -1;
+            border-radius: 30px;
+            pointer-events: none;
+        }
+        
+        /* 返回按钮样式 - 修改默认样式为更协调的灰色 */
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(120, 130, 140, 0.7); /* 更改为灰色调 */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(200, 210, 220, 0.3);
+        }
+        
+        .back-btn:hover {
+            transform: translateX(-3px);
+            background-color: rgba(100, 110, 120, 0.8);
+        }
+        
+        .back-btn svg path {
+            stroke: #ffffff; /* 图标颜色设为白色 */
+        }
+        
+        /* 动态改变返回按钮颜色以适应主题 */
+        body.dark-mode .back-btn {
+            background-color: #2d3748;
+            color: #63b3ed;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.rain-theme .back-btn {
+            background-color: rgba(30, 40, 50, 0.6);
+            color: #a0c8ff;
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(100, 150, 200, 0.2);
+        }
+        
+        body.sanye-theme .back-btn {
+            background-color: rgba(30, 30, 30, 0.4);
+            color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 页面过渡效果 */
+        .page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #292929;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .page-transition.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        /* 暗色主题下的过渡颜色 */
+        .dark-theme .page-transition {
+            background-color: #292929;
+        }
+        
+        /* 雨滴主题下的过渡颜色 */
+        .rain-theme .page-transition {
+            background-color: #303846;
+        }
+        
+        /* 三叶主题下的过渡颜色 */
+        .sanye-theme .page-transition {
+            background-color: #22583f;
+        }
+
+        /* 米兰色主题 */
+        body.milan-theme {
+            background-color: #f6f2e8;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 1s ease;
+        }
+
+        body.milan-theme .calculator {
+            background-color: rgba(246, 242, 230, 0.75);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(180, 160, 120, 0.25);
+            animation: fadeIn 0.8s ease;
+            transform-origin: center center;
+        }
+
+        body.milan-theme .display {
+            background-color: rgba(240, 235, 220, 0.7);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.15);
+            color: #5a4e3d;
+            border: 1px solid rgba(180, 160, 120, 0.25);
+            backdrop-filter: blur(5px);
+        }
+
+        body.milan-theme .current {
+            color: #4e4334;
+            text-shadow: 0 0 5px rgba(180, 160, 120, 0.3);
+        }
+
+        body.milan-theme .history {
+            color: #8a7a65;
+        }
+
+        body.milan-theme .btn {
+            background-color: rgba(240, 235, 220, 0.7);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            color: #5a4e3d;
+            border: 1px solid rgba(180, 160, 120, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        body.milan-theme .btn:hover {
+            transform: translateY(-2px);
+            background-color: rgba(245, 240, 225, 0.8);
+        }
+
+        body.milan-theme .btn:active {
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+        }
+
+        body.milan-theme .btn-operator {
+            color: #a67c52;
+            background-color: rgba(235, 225, 205, 0.7);
+        }
+
+        body.milan-theme .btn-function {
+            color: #86623e;
+            background-color: rgba(235, 225, 205, 0.7);
+        }
+
+        body.milan-theme .btn-equal {
+            background-color: rgba(180, 160, 120, 0.9);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        body.milan-theme .btn-equal:active {
+            background-color: rgba(160, 140, 100, 0.9);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        body.milan-theme .mode-btn {
+            background-color: rgba(235, 225, 205, 0.7);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #7a6b55;
+            border: 1px solid rgba(180, 160, 120, 0.25);
+        }
+
+        body.milan-theme .mode-btn.active {
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #a67c52;
+            background-color: rgba(230, 220, 200, 0.7);
+        }
+
+        body.milan-theme .settings-btn,
+        body.milan-theme .back-btn {
+            background-color: rgba(180, 160, 120, 0.7);
+            color: #fff;
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(180, 160, 120, 0.4);
+        }
+
+        /* 主题下载动画容器 */
+        .theme-download-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 20;
+            border-radius: 10px;
+        }
+
+        /* 下载进度圆环 */
+        .download-progress {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .circle-progress {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: conic-gradient(#4d7cfe 0%, transparent 0%);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .circle-progress::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(30, 30, 30, 0.5);
+        }
+
+        /* 主题预览图片 - 米兰色主题 */
+        .theme-milan {
+            background: linear-gradient(rgba(246, 242, 230, 0.9), rgba(236, 232, 220, 0.9));
+            position: relative;
+        }
+
+        .theme-milan .theme-name {
+            color: #5a4e3d;
+            background-color: rgba(246, 242, 230, 0.7);
+        }
+
+        /* 设置面板平滑过渡 */
+        .settings-panel {
+            transition: all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+
+        /* 设置面板内容容器 */
+        .settings-panel .tab-contents-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 设置面板内容 */
+        .tab-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 米兰主题下的过渡颜色 */
+        .milan-theme .page-transition {
+            background-color: #f6f2e8;
+        }
+    </style> 
+</head> 
+<body> 
+    <div class="page-transition"></div>
+    
+    <video class="video-background rain" id="rain-video" loop muted>
+        <source src="zhuti/Crosswalk Rain.mp4" type="video/mp4">
+    </video>
+    
+    <video class="video-background sanye" id="sanye-video" loop muted>
+        <source src="zhuti/山晚-三叶-最终-4k.mp4" type="video/mp4">
+    </video>
+    
+    <a href="../index.html" class="back-btn" id="back-btn" title="返回首页">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19L5 12L12 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </a>
+    
+    <button class="settings-btn" id="settings-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+    </button>
+    
+    <div class="overlay" id="overlay"></div>
+    
+    <div class="settings-panel" id="settings-panel">
+        <div class="settings-header">
+            <h2>设置</h2>
+            <button class="close-btn" id="close-settings">&times;</button>
+        </div>
+        
+        <div class="settings-tabs">
+            <button class="tab-btn active" data-tab="general">通用</button>
+            <button class="tab-btn" data-tab="theme">主题</button>
+            <button class="tab-btn" data-tab="about">关于</button>
+        </div>
+        
+        <div class="tab-contents-container">
+            <div class="tab-content active" id="general-tab">
+                <div class="form-group">
+                    <label for="calculator-size">计算器大小 (宽度px)</label>
+                    <input type="number" id="calculator-size" min="300" max="500" value="350">
+                </div>
+                
+                <div class="form-group">
+                    <label for="decimal-places">小数点保留位数</label>
+                    <input type="number" id="decimal-places" min="0" max="25" value="2">
+                </div>
+                
+                <div class="form-group">
+                    <button id="reset-settings" class="mode-btn" style="width: 100%; padding: 10px; margin-top: 10px;">重置为默认设置</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="theme-tab">
+                <div class="form-group switch-container">
+                    <label for="dark-mode-switch">黑暗模式</label>
+                    <label class="switch">
+                        <input type="checkbox" id="dark-mode-switch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>主题选择</label>
+                    <div class="theme-options">
+                        <div class="theme-option theme-light selected" data-theme="light">
+                            <div class="theme-name">默认</div>
+                        </div>
+                        <div class="theme-option theme-dark" data-theme="dark">
+                            <div class="theme-name">暗黑</div>
+                        </div>
+                        <div class="theme-option theme-rain" data-theme="rain">
+                            <video class="theme-preview" src="zhuti/Crosswalk Rain.mp4" muted></video>
+                            <div class="theme-download-container" id="rain-download-container" style="display: none;">
+                                <div class="download-progress">
+                                    <div class="circle-progress" id="rain-circle-progress"></div>
+                                </div>
+                            </div>
+                            <div class="theme-name">Rain</div>
+                        </div>
+                        <div class="theme-option theme-sanye" data-theme="sanye">
+                            <video class="theme-preview" src="zhuti/山晚-三叶-最终-4k.mp4" muted></video>
+                            <div class="theme-download-container" id="sanye-download-container" style="display: none;">
+                                <div class="download-progress">
+                                    <div class="circle-progress" id="sanye-circle-progress"></div>
+                                </div>
+                            </div>
+                            <div class="theme-name">Sanye</div>
+                        </div>
+                        <div class="theme-option theme-milan" data-theme="milan">
+                            <div class="theme-name">米兰</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="about-tab">
+                <div style="text-align: center; padding: 20px;">
+                    <h3 style="margin-bottom: 10px;">Dreamirage Tool - 计算器</h3>
+                    <p style="margin-bottom: 5px;">版本: 1.0.0</p>
+                    <p style="margin-bottom: 5px;">作者: Dreamirage Team</p>
+                    <p style="color: #888; margin-top: 20px;">
+                        一个功能强大且美观的多功能计算器
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="calculator"> 
+        <div class="display"> 
+            <div class="history" id="history"></div>
+            <div class="current" id="current">0</div> 
+        </div>
+         
+        <div class="mode-switch"> 
+            <button class="mode-btn active" id="basic-mode">基础</button>
+            <button class="mode-btn" id="scientific-mode">科学</button> 
+            <button class="mode-btn" id="programmer-mode">程序员</button>
+        </div>
+         
+        <div class="buttons" id="basic-buttons"> 
+            <!-- 第一行 --> 
+            <button class="btn btn-function">MC</button> 
+            <button class="btn btn-function">MR</button> 
+            <button class="btn btn-function">M+</button> 
+            <button class="btn btn-function">M-</button> 
+            <button class="btn btn-clear">C</button>
+             
+            <!-- 第二行 --> 
+            <button class="btn btn-function">%</button> 
+            <button class="btn btn-function">√</button> 
+            <button class="btn btn-function">x²</button> 
+            <button class="btn btn-function">1/x</button>
+            <button class="btn btn-operator">÷</button> 
+             
+            <!-- 第三行 -->
+            <button class="btn">7</button> 
+            <button class="btn">8</button> 
+            <button class="btn">9</button> 
+            <button class="btn btn-operator">×</button> 
+            <button class="btn btn-function">DEL</button> 
+            
+            <!-- 第四行 --> 
+            <button class="btn">4</button> 
+            <button class="btn">5</button> 
+            <button class="btn">6</button> 
+            <button class="btn btn-operator">-</button>
+            <button class="btn btn-function">±</button> 
+            
+            <!-- 第五行 -->
+            <button class="btn">1</button>
+            <button class="btn">2</button>
+            <button class="btn">3</button>
+            <button class="btn btn-operator">+</button>
+            <button class="btn btn-equal" id="equal">=</button> 
+             
+            <!-- 第六行 -->
+            <button class="btn" style="grid-column: span 2;">0</button> 
+            <button class="btn">.</button> 
+            <button class="btn btn-function">Ans</button> 
+            <button class="btn btn-function">Rad</button> 
+        </div> 
+         
+        <div class="buttons" id="scientific-buttons" style="display: none;">
+            <!-- 科学计算器按钮 --> 
+            <!-- 第一行 -->
+            <button class="btn btn-function">sin</button> 
+            <button class="btn btn-function">cos</button>
+            <button class="btn btn-function">tan</button>
+            <button class="btn btn-function">log</button> 
+            <button class="btn btn-function">ln</button> 
+             
+            <!-- 第二行 --> 
+            <button class="btn btn-function">sin⁻¹</button>
+            <button class="btn btn-function">cos⁻¹</button>
+            <button class="btn btn-function">tan⁻¹</button>
+            <button class="btn btn-function">10ˣ</button> 
+            <button class="btn btn-function">eˣ</button>
+             
+            <!-- 第三行 -->
+            <button class="btn btn-function">π</button> 
+            <button class="btn btn-function">e</button>
+            <button class="btn btn-function">x^y</button> 
+            <button class="btn btn-function">x!</button>
+            <button class="btn btn-clear">C</button>
+             
+            <!-- 第四行 --> 
+            <button class="btn">7</button> 
+            <button class="btn">8</button> 
+            <button class="btn">9</button> 
+            <button class="btn btn-operator">÷</button> 
+            <button class="btn btn-function">DEL</button> 
+            
+            <!-- 第五行 --> 
+            <button class="btn">4</button> 
+            <button class="btn">5</button> 
+            <button class="btn">6</button> 
+            <button class="btn btn-operator">×</button> 
+            <button class="btn btn-function">(</button> 
+            
+            <!-- 第六行 -->
+            <button class="btn">1</button>
+            <button class="btn">2</button>
+            <button class="btn">3</button>
+            <button class="btn btn-operator">-</button> 
+            <button class="btn btn-function">)</button>
+             
+            <!-- 第七行 -->
+            <button class="btn">0</button>
+            <button class="btn">.</button> 
+            <button class="btn btn-function">Ans</button> 
+            <button class="btn btn-operator">+</button> 
+            <button class="btn btn-equal">=</button> 
+        </div>
+         
+        <div class="buttons" id="programmer-buttons" style="display: none;"> 
+            <!-- 程序员计算器按钮 -->
+            <!-- 第一行 --> 
+            <button class="btn btn-function">Hex</button> 
+            <button class="btn btn-function">Dec</button>
+            <button class="btn btn-function">Oct</button> 
+            <button class="btn btn-function">Bin</button> 
+            <button class="btn btn-clear">C</button>
+             
+            <!-- 第二行 --> 
+            <button class="btn btn-function">AND</button> 
+            <button class="btn btn-function">OR</button>
+            <button class="btn btn-function">XOR</button>
+            <button class="btn btn-function">NOT</button>
+            <button class="btn btn-function">DEL</button> 
+            
+            <!-- 第三行 --> 
+            <button class="btn btn-function"><<</button> 
+            <button class="btn btn-function">>></button> 
+            <button class="btn btn-function">A</button> 
+            <button class="btn btn-function">B</button>
+            <button class="btn btn-function">C</button>
+             
+            <!-- 第四行 --> 
+            <button class="btn">7</button> 
+            <button class="btn">8</button> 
+            <button class="btn">9</button> 
+            <button class="btn btn-operator">÷</button> 
+            <button class="btn btn-function">D</button> 
+            
+            <!-- 第五行 -->
+            <button class="btn">4</button>
+            <button class="btn">5</button>
+            <button class="btn">6</button>
+            <button class="btn btn-operator">×</button>
+            <button class="btn btn-function">E</button> 
+            
+            <!-- 第六行 --> 
+            <button class="btn">1</button> 
+            <button class="btn">2</button> 
+            <button class="btn">3</button> 
+            <button class="btn btn-operator">-</button>
+            <button class="btn btn-function">F</button>
+             
+            <!-- 第七行 --> 
+            <button class="btn" style="grid-column: span 2;">0</button>
+            <button class="btn btn-function">MOD</button> 
+            <button class="btn btn-operator">+</button>
+            <button class="btn btn-equal">=</button> 
+        </div>
+    </div> 
+ 
+    <script> 
+        document.addEventListener('DOMContentLoaded',  function() { 
+            const historyDisplay = document.getElementById('history');  
+            const currentDisplay = document.getElementById('current');  
+            const basicMode = document.getElementById('basic-mode'); 
+            const scientificMode = document.getElementById('scientific-mode');  
+            const programmerMode = document.getElementById('programmer-mode');  
+            const basicButtons = document.getElementById('basic-buttons'); 
+            const scientificButtons = document.getElementById('scientific-buttons'); 
+            const programmerButtons = document.getElementById('programmer-buttons');  
+             
+            // 设置相关元素
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsPanel = document.getElementById('settings-panel');
+            const closeSettings = document.getElementById('close-settings');
+            const overlay = document.getElementById('overlay');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const calculatorSizeInput = document.getElementById('calculator-size');
+            const decimalPlacesInput = document.getElementById('decimal-places');
+            const darkModeSwitch = document.getElementById('dark-mode-switch');
+            const themeOptions = document.querySelectorAll('.theme-option');
+            
+            // 主题下载相关元素
+            const downloadContainer = document.getElementById('download-container');
+            const circleProgress = document.getElementById('circle-progress');
+            const progressText = document.getElementById('progress-text');
+            const downloadMessage = document.getElementById('download-message');
+            
+            // 主题资源
+            const themeResources = {
+                rain: {
+                    video: document.getElementById('rain-video'),
+                    size: 15, // MB（模拟）
+                    downloaded: false
+                },
+                sanye: {
+                    video: document.getElementById('sanye-video'),
+                    size: 20, // MB（模拟）
+                    downloaded: false
+                }
+            };
+            
+            // 初始化设置
+            let decimalPlaces = 2;
+            let calculatorSize = 350;
+            let isDarkMode = false;
+            let currentTheme = 'light';
+             
+            let currentValue = '0';
+            let previousValue = ''; 
+            let operation = null;
+            let resetScreen = false; 
+            let memory = 0;
+            let lastAnswer = 0;
+            
+            // 设置面板过渡
+            function animateSettingsPanel(show) {
+                if (show) {
+                    settingsPanel.style.opacity = '0';
+                    settingsPanel.style.transform = 'translate(-50%, -45%) scale(0.95)';
+                    settingsPanel.classList.add('active');
+                    overlay.classList.add('active');
+                    
+                    // 强制重绘
+                    void settingsPanel.offsetWidth;
+                    
+                    // 显示动画
+                    settingsPanel.style.opacity = '1';
+                    settingsPanel.style.transform = 'translate(-50%, -50%) scale(1)';
+                } else {
+                    // 隐藏动画
+                    settingsPanel.style.opacity = '0';
+                    settingsPanel.style.transform = 'translate(-50%, -45%) scale(0.95)';
+                    
+                    // 动画完成后移除active类
+                    setTimeout(() => {
+                        settingsPanel.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }, 300);
+                }
+            }
+            
+            // 检查主题是否已经下载
+            function isThemeDownloaded(theme) {
+                return localStorage.getItem(`theme_${theme}_downloaded`) === 'true' || 
+                       theme === 'light' || 
+                       theme === 'dark' ||
+                       theme === 'milan';
+            }
+            
+            // 设置主题已下载
+            function setThemeDownloaded(theme) {
+                localStorage.setItem(`theme_${theme}_downloaded`, 'true');
+                themeResources[theme].downloaded = true;
+            }
+            
+            // 模拟下载主题
+            function downloadTheme(theme) {
+                if (isThemeDownloaded(theme)) {
+                    applyTheme(theme);
+                    return;
+                }
+                
+                // 显示对应主题的下载容器
+                const downloadContainer = document.getElementById(`${theme}-download-container`);
+                const circleProgress = document.getElementById(`${theme}-circle-progress`);
+                if (!downloadContainer || !circleProgress) return;
+                
+                downloadContainer.style.display = 'flex';
+                
+                const themeSize = themeResources[theme].size;
+                let downloaded = 0;
+                const downloadInterval = 100; // 每100ms更新一次
+                
+                const downloadTimer = setInterval(() => {
+                    // 随机增加一些进度（0.1到0.5 MB）
+                    const increment = Math.random() * 0.4 + 0.1;
+                    downloaded = Math.min(downloaded + increment, themeSize);
+                    
+                    // 计算百分比
+                    const percent = Math.floor((downloaded / themeSize) * 100);
+                    
+                    // 更新圆环进度
+                    circleProgress.style.background = `conic-gradient(#4d7cfe ${percent}%, transparent ${percent}%)`;
+                    
+                    // 下载完成
+                    if (downloaded >= themeSize) {
+                        clearInterval(downloadTimer);
+                        
+                        // 设置已下载状态
+                        setThemeDownloaded(theme);
+                        
+                        // 隐藏下载界面并应用主题
+                        setTimeout(() => {
+                            downloadContainer.style.display = 'none';
+                            applyTheme(theme);
+                        }, 500);
+                    }
+                }, downloadInterval);
+            }
+            
+            // 应用主题
+            function applyTheme(theme) {
+                document.body.classList.remove('dark-mode', 'rain-theme', 'sanye-theme', 'milan-theme');
+                const rainVideo = document.getElementById('rain-video');
+                const sanyeVideo = document.getElementById('sanye-video');
+                const backBtn = document.getElementById('back-btn');
+                
+                // 暂停所有视频
+                rainVideo.pause();
+                sanyeVideo.pause();
+                
+                currentTheme = theme;
+                updateThemeSelection(theme);
+                
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    darkModeSwitch.checked = true;
+                    // 更新返回按钮样式
+                    backBtn.style.backgroundColor = '#2d3748';
+                    backBtn.style.color = '#63b3ed';
+                    backBtn.style.boxShadow = '1px 1px 3px rgba(0, 0, 0, 0.2)';
+                    backBtn.style.border = 'none';
+                    backBtn.style.backdropFilter = 'none';
+                } else if (theme === 'rain') {
+                    document.body.classList.add('rain-theme');
+                    darkModeSwitch.checked = false;
+                    rainVideo.play();
+                    // 更新返回按钮样式
+                    backBtn.style.backgroundColor = 'rgba(30, 40, 50, 0.6)';
+                    backBtn.style.color = '#a0c8ff';
+                    backBtn.style.backdropFilter = 'blur(3px)';
+                    backBtn.style.border = '1px solid rgba(100, 150, 200, 0.2)';
+                } else if (theme === 'sanye') {
+                    document.body.classList.add('sanye-theme');
+                    darkModeSwitch.checked = false;
+                    sanyeVideo.play();
+                    // 更新返回按钮样式
+                    backBtn.style.backgroundColor = 'rgba(30, 30, 30, 0.4)';
+                    backBtn.style.color = 'rgba(255, 255, 255, 0.9)';
+                    backBtn.style.backdropFilter = 'blur(5px)';
+                    backBtn.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                } else if (theme === 'milan') {
+                    document.body.classList.add('milan-theme');
+                    darkModeSwitch.checked = false;
+                    // 更新返回按钮样式
+                    backBtn.style.backgroundColor = 'rgba(180, 160, 120, 0.7)';
+                    backBtn.style.color = '#fff';
+                    backBtn.style.backdropFilter = 'blur(3px)';
+                    backBtn.style.border = '1px solid rgba(180, 160, 120, 0.4)';
+                } else {
+                    darkModeSwitch.checked = false;
+                    // 恢复默认返回按钮样式为灰色
+                    backBtn.style.backgroundColor = 'rgba(120, 130, 140, 0.7)';
+                    backBtn.style.color = 'white';
+                    backBtn.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.15)';
+                    backBtn.style.border = '1px solid rgba(200, 210, 220, 0.3)';
+                    backBtn.style.backdropFilter = 'none';
+                }
+                
+                // 保存当前主题到本地存储
+                localStorage.setItem('calculatorTheme', theme);
+            }
+            
+            // 确保视频预览显示第一帧
+            document.querySelectorAll('.theme-preview').forEach(preview => {
+                if (preview.tagName.toLowerCase() === 'video') {
+                    // 设置currentTime为一个小值以确保能看到视频的第一帧
+                    preview.addEventListener('loadeddata', function() {
+                        this.currentTime = 0.1;
+                        this.pause();
+                    });
+                    preview.load();
+                }
+            });
+            
+            // 设置按钮点击事件
+            settingsBtn.addEventListener('click', function() {
+                animateSettingsPanel(true);
+            });
+            
+            // 关闭设置面板
+            closeSettings.addEventListener('click', function() {
+                animateSettingsPanel(false);
+            });
+            
+            // 点击遮罩层关闭设置面板
+            overlay.addEventListener('click', function() {
+                animateSettingsPanel(false);
+            });
+            
+            // 重置按钮点击事件
+            document.getElementById('reset-settings').addEventListener('click', function() {
+                // 重置计算器大小
+                calculatorSize = 350;
+                calculatorSizeInput.value = 350;
+                document.querySelector('.calculator').style.width = `350px`;
+                
+                // 重置小数位数
+                decimalPlaces = 2;
+                decimalPlacesInput.value = 2;
+                
+                // 重置主题
+                isDarkMode = false;
+                darkModeSwitch.checked = false;
+                applyTheme('light');
+            });
+            
+            // 选项卡切换
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 如果已经是当前选项卡，不执行任何操作
+                    if (btn.classList.contains('active')) return;
+                    
+                    // 获取当前活动的选项卡和目标选项卡内容
+                    const activeTabContent = document.querySelector('.tab-content.active');
+                    const targetTabContent = document.getElementById(`${btn.dataset.tab}-tab`);
+                    
+                    if (!activeTabContent || !targetTabContent) return;
+                    
+                    // 切换按钮状态
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // 记录当前面板高度
+                    const currentHeight = activeTabContent.offsetHeight;
+                    const tabContentContainer = document.querySelector('.tab-contents-container');
+                    
+                    // 设置当前高度
+                    tabContentContainer.style.height = `${currentHeight}px`;
+                    
+                    // 强制重绘
+                    void tabContentContainer.offsetHeight;
+                    
+                    // 先隐藏当前内容，显示目标内容以获取实际高度
+                    activeTabContent.classList.remove('active');
+                    targetTabContent.classList.add('active');
+                    
+                    // 动画过渡到新高度
+                    const targetHeight = targetTabContent.offsetHeight;
+                    tabContentContainer.style.transition = 'height 0.3s ease';
+                    tabContentContainer.style.height = `${targetHeight}px`;
+                    
+                    // 完成后重置
+                    setTimeout(() => {
+                        tabContentContainer.style.height = 'auto';
+                        tabContentContainer.style.transition = '';
+                    }, 300);
+                });
+            });
+            
+            // 设置计算器大小
+            calculatorSizeInput.addEventListener('change', function() {
+                calculatorSize = parseInt(this.value);
+                // 添加大小限制
+                if (calculatorSize < 300) {
+                    calculatorSize = 300;
+                    this.value = 300;
+                } else if (calculatorSize > 500) {
+                    calculatorSize = 500;
+                    this.value = 500;
+                }
+                document.querySelector('.calculator').style.width = `${calculatorSize}px`;
+            });
+            
+            // 设置小数点保留位数
+            decimalPlacesInput.addEventListener('change', function() {
+                decimalPlaces = parseInt(this.value);
+                // 添加小数位数限制
+                if (decimalPlaces < 0) {
+                    decimalPlaces = 0;
+                    this.value = 0;
+                } else if (decimalPlaces > 25) {
+                    decimalPlaces = 25;
+                    this.value = 25;
+                }
+                // 如果当前显示的是数字，则应用新的小数点设置
+                if (!isNaN(parseFloat(currentValue))) {
+                    currentValue = parseFloat(currentValue).toFixed(decimalPlaces);
+                    currentDisplay.textContent = currentValue;
+                }
+            });
+            
+            // 切换暗黑模式
+            darkModeSwitch.addEventListener('change', function() {
+                isDarkMode = this.checked;
+                
+                if (isDarkMode) {
+                    applyTheme('dark');
+                } else {
+                    // 恢复之前的非暗黑主题，如果是dark则使用light
+                    if (currentTheme === 'dark') {
+                        applyTheme('light');
+                    } else {
+                        applyTheme(currentTheme);
+                    }
+                }
+            });
+            
+            // 主题选择
+            themeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const theme = this.dataset.theme;
+                    
+                    // 如果选择的是需要下载的主题并且尚未下载
+                    if ((theme === 'rain' || theme === 'sanye') && !isThemeDownloaded(theme)) {
+                        downloadTheme(theme);
+                    } else {
+                        applyTheme(theme);
+                    }
+                });
+            });
+            
+            // 更新主题选择UI
+            function updateThemeSelection(theme) {
+                themeOptions.forEach(option => {
+                    if (option.dataset.theme === theme) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+            }
+            
+            // 模式切换 
+            basicMode.addEventListener('click',  function() { 
+                basicMode.classList.add('active'); 
+                scientificMode.classList.remove('active'); 
+                programmerMode.classList.remove('active'); 
+                basicButtons.style.display  = 'grid';
+                scientificButtons.style.display  = 'none'; 
+                programmerButtons.style.display  = 'none';
+            }); 
+             
+            scientificMode.addEventListener('click',  function() {
+                basicMode.classList.remove('active'); 
+                scientificMode.classList.add('active'); 
+                programmerMode.classList.remove('active'); 
+                basicButtons.style.display  = 'none';
+                scientificButtons.style.display  = 'grid'; 
+                programmerButtons.style.display  = 'none';
+            });
+             
+            programmerMode.addEventListener('click',  function() { 
+                basicMode.classList.remove('active');  
+                scientificMode.classList.remove('active');  
+                programmerMode.classList.add('active');  
+                basicButtons.style.display  = 'none'; 
+                scientificButtons.style.display  = 'none';
+                programmerButtons.style.display  = 'grid'; 
+            }); 
+            
+            // 为所有按钮添加点击事件 
+            document.querySelectorAll('.btn').forEach(button  => {
+                button.addEventListener('click',  function() {
+                    const value = this.textContent;  
+                     
+                    // 数字按钮 
+                    if (!isNaN(value) || value === '.') {
+                        if (resetScreen) {
+                            currentValue = '0'; 
+                            resetScreen = false; 
+                        } 
+                         
+                        if (value === '.' && currentValue.includes('.'))  {
+                            return;
+                        }
+                        
+                        if (currentValue === '0' && value !== '.') {
+                            currentValue = value;
+                        } else { 
+                            currentValue += value; 
+                        } 
+                         
+                        currentDisplay.textContent  = currentValue; 
+                    } 
+                     
+                    // 运算符按钮
+                    else if (['+', '-', '×', '÷'].includes(value)) { 
+                        if (operation !== null) { 
+                            calculate();
+                        }
+                         
+                        previousValue = currentValue;
+                        operation = value; 
+                        historyDisplay.textContent  = previousValue + ' ' + operation; 
+                        resetScreen = true; 
+                    } 
+                     
+                    // 等号按钮 
+                    else if (value === '=') { 
+                        calculate();
+                        operation = null; 
+                    }
+                     
+                    // 清除按钮
+                    else if (value === 'C') {
+                        clear();
+                    }
+                     
+                                        // 删除按钮
+                                        else if (value === 'DEL') { 
+                        if (currentValue.length  > 1) {
+                            currentValue = currentValue.slice(0,  -1);
+                        } else { 
+                            currentValue = '0';
+                        }
+                        currentDisplay.textContent  = currentValue;
+                    }
+                     
+                    // 正负号切换
+                    else if (value === '±') { 
+                        currentValue = (parseFloat(currentValue) * -1).toString(); 
+                        currentDisplay.textContent  = currentValue; 
+                    } 
+                    
+                    // 百分比 
+                    else if (value === '%') {
+                        currentValue = (parseFloat(currentValue) / 100).toString();
+                        currentDisplay.textContent  = currentValue;
+                    }
+                     
+                    // 平方根
+                    else if (value === '√') { 
+                        if (parseFloat(currentValue) >= 0) { 
+                            currentValue = Math.sqrt(parseFloat(currentValue)).toString(); 
+                            currentDisplay.textContent  = currentValue;
+                        } else {
+                            currentDisplay.textContent  = 'Error'; 
+                            resetScreen = true; 
+                        } 
+                    } 
+                     
+                    // 平方 
+                    else if (value === 'x²') { 
+                        currentValue = (parseFloat(currentValue) ** 2).toString();
+                        currentDisplay.textContent  = currentValue;
+                    }
+                     
+                    // 倒数
+                    else if (value === '1/x') { 
+                        if (parseFloat(currentValue) !== 0) { 
+                            currentValue = (1 / parseFloat(currentValue)).toString(); 
+                            currentDisplay.textContent  = currentValue; 
+                        } else {
+                            currentDisplay.textContent  = 'Error';
+                            resetScreen = true;
+                        }
+                    }
+                    
+                    // 记忆功能
+                    else if (value === 'MC') {
+                        memory = 0;
+                    }
+                    else if (value === 'MR') {
+                        currentValue = memory.toString(); 
+                        currentDisplay.textContent  = currentValue;
+                    }
+                    else if (value === 'M+') { 
+                        memory += parseFloat(currentValue);
+                    }
+                    else if (value === 'M-') { 
+                        memory -= parseFloat(currentValue); 
+                    } 
+                     
+                    // 上次计算结果 
+                    else if (value === 'Ans') {
+                        currentValue = lastAnswer.toString();  
+                        currentDisplay.textContent  = currentValue; 
+                    } 
+                    
+                    // 科学计算功能
+                    else if (value === 'sin') {
+                        currentValue = Math.sin(parseFloat(currentValue)).toString();  
+                        currentDisplay.textContent  = currentValue; 
+                    } 
+                    else if (value === 'cos') {
+                        currentValue = Math.cos(parseFloat(currentValue)).toString();  
+                        currentDisplay.textContent  = currentValue; 
+                    } 
+                    else if (value === 'tan') { 
+                        currentValue = Math.tan(parseFloat(currentValue)).toString(); 
+                        currentDisplay.textContent  = currentValue;
+                    }
+                    else if (value === 'log') { 
+                        if (parseFloat(currentValue) > 0) { 
+                            currentValue = Math.log10(parseFloat(currentValue)).toString(); 
+                            currentDisplay.textContent  = currentValue;
+                        } else { 
+                            currentDisplay.textContent  = 'Error'; 
+                            resetScreen = true; 
+                        } 
+                    } 
+                    else if (value === 'ln') {
+                        if (parseFloat(currentValue) > 0) { 
+                            currentValue = Math.log(parseFloat(currentValue)).toString(); 
+                            currentDisplay.textContent  = currentValue;
+                        } else { 
+                            currentDisplay.textContent  = 'Error';
+                            resetScreen = true;
+                        }
+                    }
+                    else if (value === 'sin⁻¹') { 
+                        if (parseFloat(currentValue) >= -1 && parseFloat(currentValue) <= 1) { 
+                            currentValue = Math.asin(parseFloat(currentValue)).toString();  
+                            currentDisplay.textContent  = currentValue; 
+                        } else {
+                            currentDisplay.textContent  = 'Error';
+                            resetScreen = true;
+                        }
+                    }
+                    else if (value === 'cos⁻¹') { 
+                        if (parseFloat(currentValue) >= -1 && parseFloat(currentValue) <= 1) { 
+                            currentValue = Math.acos(parseFloat(currentValue)).toString(); 
+                            currentDisplay.textContent  = currentValue;
+                        } else { 
+                            currentDisplay.textContent  = 'Error';
+                            resetScreen = true;
+                        }
+                    }
+                    else if (value === 'tan⁻¹') { 
+                        currentValue = Math.atan(parseFloat(currentValue)).toString(); 
+                        currentDisplay.textContent  = currentValue;
+                    }
+                    else if (value === '10ˣ') { 
+                        currentValue = (10 ** parseFloat(currentValue)).toString();
+                        currentDisplay.textContent  = currentValue;
+                    }
+                    else if (value === 'eˣ') {
+                        currentValue = Math.exp(parseFloat(currentValue)).toString();  
+                        currentDisplay.textContent  = currentValue; 
+                    } 
+                    else if (value === 'π') { 
+                        currentValue = Math.PI.toString();  
+                        currentDisplay.textContent  = currentValue; 
+                    } 
+                    else if (value === 'e') {
+                        currentValue = Math.E.toString(); 
+                        currentDisplay.textContent  = currentValue;
+                    }
+                    else if (value === 'x^y') {
+                        if (operation !== null) { 
+                            calculate();
+                        }
+                        
+                        previousValue = currentValue;
+                        operation = 'x^y'; 
+                        historyDisplay.textContent = previousValue + ' ^ ';
+                        resetScreen = true;
+                    }
+                    else if (value === 'x!') {
+                        if (parseFloat(currentValue) >= 0 && Number.isInteger(parseFloat(currentValue)))  { 
+                            currentValue = factorial(parseFloat(currentValue)).toString();
+                            currentDisplay.textContent  = currentValue;
+                        } else { 
+                            currentDisplay.textContent  = 'Error'; 
+                            resetScreen = true; 
+                        } 
+                    } 
+                     
+                    // 程序员计算器功能
+                    else if (value === 'Hex') {
+                        if (Number.isInteger(parseFloat(currentValue)))  { 
+                            currentValue = parseInt(currentValue).toString(16).toUpperCase(); 
+                            currentDisplay.textContent  = currentValue; 
+                        } 
+                    }
+                    else if (value === 'Dec') {
+                        // 如果当前是其他进制，转回十进制
+                        if (!/^\d+$/.test(currentValue)) {
+                            try {
+                                currentValue = parseInt(currentValue, 16).toString();
+                                currentDisplay.textContent  = currentValue;
+                            } catch (e) {
+                                currentDisplay.textContent  = 'Error'; 
+                                resetScreen = true; 
+                            } 
+                        } 
+                    } 
+                    else if (value === 'Oct') {
+                        if (Number.isInteger(parseFloat(currentValue)))  {
+                            currentValue = parseInt(currentValue).toString(8); 
+                            currentDisplay.textContent  = currentValue; 
+                        } 
+                    } 
+                    else if (value === 'Bin') {
+                        if (Number.isInteger(parseFloat(currentValue)))  { 
+                            currentValue = parseInt(currentValue).toString(2);
+                            currentDisplay.textContent  = currentValue;
+                        }
+                    }
+                    else if (value === 'AND') {
+                        if (operation !== null) { 
+                            calculate('AND');
+                        } else {
+                            previousValue = currentValue;
+                            operation = 'AND'; 
+                            historyDisplay.textContent  = previousValue + ' AND';
+                            resetScreen = true;
+                        }
+                    }
+                    else if (value === 'OR') {
+                        if (operation !== null) { 
+                            calculate('OR'); 
+                        } else {
+                            previousValue = currentValue;
+                            operation = 'OR'; 
+                            historyDisplay.textContent  = previousValue + ' OR'; 
+                            resetScreen = true; 
+                        } 
+                    } 
+                    else if (value === 'XOR') {
+                        if (operation !== null) { 
+                            calculate('XOR'); 
+                        } else {
+                            previousValue = currentValue;
+                            operation = 'XOR'; 
+                            historyDisplay.textContent  = previousValue + ' XOR';
+                            resetScreen = true;
+                        }
+                    }
+                    else if (value === 'NOT') {
+                        if (Number.isInteger(parseFloat(currentValue)))  { 
+                            currentValue = (~parseInt(currentValue)).toString();
+                            currentDisplay.textContent  = currentValue;
+                        }
+                    }
+                    else if (value === '<<') {
+                        if (operation !== null) {
+                            calculate('<<');
+                        } else { 
+                            previousValue = currentValue; 
+                            operation = '<<';
+                            historyDisplay.textContent  = previousValue + ' <<';
+                            resetScreen = true;
+                        }
+                    }
+                    else if (value === '>>') {
+                        if (operation !== null) { 
+                            calculate('>>'); 
+                        } else {
+                            previousValue = currentValue;
+                            operation = '>>';
+                            historyDisplay.textContent  = previousValue + ' >>';
+                            resetScreen = true;
+                        }
+                    }
+                    else if (value === 'MOD') {
+                        if (operation !== null) { 
+                            calculate('MOD'); 
+                        } else {
+                            previousValue = currentValue; 
+                            operation = 'MOD';
+                            historyDisplay.textContent  = previousValue + ' MOD';
+                            resetScreen = true;
+                        }
+                    }
+                    // 十六进制字母
+                    else if (['A', 'B', 'C', 'D', 'E', 'F'].includes(value)) {
+                        if (resetScreen) { 
+                            currentValue = value;
+                            resetScreen = false; 
+                        } else {
+                            currentValue += value;
+                        }
+                        currentDisplay.textContent  = currentValue;
+                    }
+                }); 
+            }); 
+             
+            // 计算函数
+            function calculate(op = operation) {
+                let result; 
+                const prev = parseFloat(previousValue);
+                const current = parseFloat(currentValue);
+                 
+                if (isNaN(prev) || isNaN(current)) return;
+                
+                switch (op) {
+                    case '+':
+                        result = prev + current;
+                        break; 
+                    case '-':
+                        result = prev - current;
+                        break; 
+                    case '×':
+                        result = prev * current; 
+                        break; 
+                    case '÷': 
+                        if (current === 0) { 
+                            currentDisplay.textContent  = 'Error';
+                            resetScreen = true;
+                            return;
+                        }
+                        result = prev / current; 
+                        break; 
+                    case 'x^y':
+                        result = Math.pow(prev,  current);
+                        break; 
+                    case 'AND':
+                        result = prev & current;
+                        break; 
+                    case 'OR': 
+                        result = prev | current; 
+                        break;
+                    case 'XOR':
+                        result = prev ^ current; 
+                        break; 
+                    case '<<':
+                        result = prev << current;
+                        break;
+                    case '>>':
+                        result = prev >> current;
+                        break; 
+                    case 'MOD': 
+                        if (current === 0) {
+                            currentDisplay.textContent  = 'Error';
+                            resetScreen = true;
+                            return; 
+                        } 
+                        result = prev % current; 
+                        break;
+                    default:
+                        return;
+                } 
+                
+                // 应用小数点保留位数
+                if (!Number.isInteger(result)) {
+                    result = parseFloat(result.toFixed(decimalPlaces));
+                }
+                
+                // 更新显示 
+                historyDisplay.textContent  = `${previousValue} ${op} ${currentValue} =`; 
+                currentValue = result.toString(); 
+                currentDisplay.textContent  = currentValue;
+                lastAnswer = result; 
+                resetScreen = true;
+            } 
+             
+            // 清除函数
+            function clear() {
+                currentValue = '0';
+                previousValue = ''; 
+                operation = null;
+                currentDisplay.textContent  = currentValue;
+                historyDisplay.textContent  = ''; 
+            }
+             
+            // 阶乘函数 
+            function factorial(n) { 
+                if (n === 0 || n === 1) return 1; 
+                let result = 1;
+                for (let i = 2; i <= n; i++) {
+                    result *= i;
+                } 
+                return result;
+            } 
+            
+            // 键盘支持
+            document.addEventListener('keydown',  function(event) { 
+                const key = event.key; 
+                 
+                // 数字和小数点
+                if (!isNaN(key) || key === '.') {
+                    document.querySelector(`.btn:not(.btn-function):not(.btn-operator):not(.btn-equal):not(.btn-clear):contains('${key}')`).click();  
+                } 
+                
+                // 运算符
+                else if (['+', '-'].includes(key)) {
+                    document.querySelector(`.btn-operator:contains('${key}')`).click();  
+                }
+                else if (key === '*') {
+                    document.querySelector(`.btn-operator:contains('×')`).click(); 
+                } 
+                else if (key === '/') {
+                    document.querySelector(`.btn-operator:contains('÷')`).click();  
+                }
+                 
+                // 等号和回车
+                else if (key === '=' || key === 'Enter') { 
+                    document.querySelector(`.btn-equal`).click();  
+                }
+                 
+                // 退格和删除
+                else if (key === 'Backspace' || key === 'Delete') {
+                    document.querySelector(`.btn-function:contains('DEL')`).click(); 
+                }
+                 
+                // Escape 清除
+                else if (key === 'Escape') {
+                    document.querySelector(`.btn-clear`).click();  
+                }
+            });
+             
+            // 添加:contains选择器
+            jQuery.expr[':'].contains  = function(a, i, m) {
+                return jQuery(a).text().toUpperCase() 
+                    .indexOf(m[3].toUpperCase()) >= 0; 
+            };
+            
+            // 检查当前主题并应用对应的返回按钮样式
+            function applyBackButtonTheme() {
+                const backBtn = document.getElementById('back-btn');
+                if (document.body.classList.contains('dark-mode')) {
+                    backBtn.style.backgroundColor = '#2d3748';
+                    backBtn.style.color = '#63b3ed';
+                    backBtn.style.boxShadow = '1px 1px 3px rgba(0, 0, 0, 0.2)';
+                    backBtn.style.border = 'none';
+                } else if (document.body.classList.contains('rain-theme')) {
+                    backBtn.style.backgroundColor = 'rgba(30, 40, 50, 0.6)';
+                    backBtn.style.color = '#a0c8ff';
+                    backBtn.style.backdropFilter = 'blur(3px)';
+                    backBtn.style.border = '1px solid rgba(100, 150, 200, 0.2)';
+                } else if (document.body.classList.contains('sanye-theme')) {
+                    backBtn.style.backgroundColor = 'rgba(30, 30, 30, 0.4)';
+                    backBtn.style.color = 'rgba(255, 255, 255, 0.9)';
+                    backBtn.style.backdropFilter = 'blur(5px)';
+                    backBtn.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                }
+            }
+
+            // 初始化主题并应用返回按钮样式
+            applyBackButtonTheme();
+            
+            // 页面加载效果
+            document.body.classList.add('loaded');
+        }); 
+
+        // 返回首页过渡效果
+        document.getElementById('back-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            const transition = document.querySelector('.page-transition');
+            
+            transition.classList.add('active');
+            
+            setTimeout(() => {
+                window.location.href = href;
+            }, 300);
+        });
+
+        // 从本地存储加载主题
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('calculatorTheme');
+            if (savedTheme) {
+                if ((savedTheme === 'rain' || savedTheme === 'sanye') && !isThemeDownloaded(savedTheme)) {
+                    // 如果选择的主题需要下载但尚未下载
+                    downloadTheme(savedTheme);
+                } else {
+                    // 直接应用已下载的主题
+                    applyTheme(savedTheme);
+                }
+            } else {
+                // 默认应用亮色主题
+                applyTheme('light');
+            }
+        }
+        
+        // 获取已下载的主题状态
+        function checkDownloadedThemes() {
+            // 检查每个可下载主题的状态
+            themeResources.rain.downloaded = localStorage.getItem('theme_rain_downloaded') === 'true';
+            themeResources.sanye.downloaded = localStorage.getItem('theme_sanye_downloaded') === 'true';
+        }
+        
+        // 页面加载完成后立即应用主题
+        window.addEventListener('load', function() {
+            checkDownloadedThemes();
+            loadSavedTheme();
+        });
+    </script>
+</body>
+</html>

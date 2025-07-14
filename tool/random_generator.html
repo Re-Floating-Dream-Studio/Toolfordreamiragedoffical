@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机数生成器 - Dreamirage Tool</title>
+    <meta name="description" content="生成随机数字、字符串，满足各种随机化需求">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'MiSans', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .home-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .home-btn i {
+            margin-right: 6px;
+        }
+        
+        .home-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .tab-container {
+            margin-bottom: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab:hover:not(.active) {
+            border-bottom-color: #ddd;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .checkbox-input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .result-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .copy-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .copy-btn i {
+            margin-right: 6px;
+        }
+        
+        .copy-btn:hover {
+            background-color: #3d80d6;
+        }
+        
+        .result-value {
+            font-family: 'MiSans', monospace;
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+            font-size: 16px;
+            line-height: 1.5;
+            overflow-wrap: break-word;
+            min-height: 60px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 576px) {
+            .option-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+        }
+        
+        .history-container {
+            margin-top: 30px;
+        }
+        
+        .history-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .history-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .history-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .history-item {
+            background-color: white;
+            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid #eee;
+            font-family: 'MiSans', monospace;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .history-item:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+            border-color: var(--primary-color);
+        }
+        
+        .footer {
+            background-color: var(--card-bg);
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+            margin-top: auto;
+        }
+        
+        .copyright {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="../index.html" class="logo-container">
+                <img src="../img/logo.png" alt="Dreamirage Logo" class="logo">
+                <h1 class="title">随机数生成器</h1>
+            </a>
+            <a href="../index.html" class="home-btn">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2 class="card-title">随机数生成器</h2>
+                
+                <div class="tab-container">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="numbers">随机数字</div>
+                        <div class="tab" data-tab="strings">随机字符串</div>
+                        <div class="tab" data-tab="lists">随机列表</div>
+                    </div>
+                    
+                    <!-- 随机数字 -->
+                    <div class="tab-content active" id="numbers">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="num-min">最小值:</label>
+                                <input type="number" class="form-input" id="num-min" value="1">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="num-max">最大值:</label>
+                                <input type="number" class="form-input" id="num-max" value="100">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="num-quantity">生成数量:</label>
+                            <input type="number" class="form-input" id="num-quantity" min="1" max="100" value="1">
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="checkbox-input" id="num-unique">
+                                生成不重复的数字
+                            </label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="checkbox-input" id="num-sort">
+                                排序结果
+                            </label>
+                        </div>
+                        
+                        <button class="btn" id="generate-num-btn">
+                            <i class="fas fa-random"></i> 生成随机数字
+                        </button>
+                        
+                        <div class="result-container" id="num-result-container" style="display: none;">
+                            <div class="result-title">
+                                <span>随机数字结果:</span>
+                                <button class="copy-btn" id="copy-num-btn">
+                                    <i class="fas fa-copy"></i> 复制
+                                </button>
+                            </div>
+                            <div class="result-value" id="num-result"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 随机字符串 -->
+                    <div class="tab-content" id="strings">
+                        <div class="form-group">
+                            <label class="form-label" for="str-length">字符串长度:</label>
+                            <input type="number" class="form-input" id="str-length" min="1" max="100" value="12">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="str-quantity">生成数量:</label>
+                            <input type="number" class="form-input" id="str-quantity" min="1" max="20" value="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">包含字符:</label>
+                            <div class="option-grid">
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="checkbox-input" id="str-uppercase" checked>
+                                        大写字母 (A-Z)
+                                    </label>
+                                </div>
+                                
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="checkbox-input" id="str-lowercase" checked>
+                                        小写字母 (a-z)
+                                    </label>
+                                </div>
+                                
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="checkbox-input" id="str-numbers" checked>
+                                        数字 (0-9)
+                                    </label>
+                                </div>
+                                
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="checkbox-input" id="str-symbols">
+                                        特殊符号 (!@#$%^&*)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" id="generate-str-btn">
+                            <i class="fas fa-random"></i> 生成随机字符串
+                        </button>
+                        
+                        <div class="result-container" id="str-result-container" style="display: none;">
+                            <div class="result-title">
+                                <span>随机字符串结果:</span>
+                                <button class="copy-btn" id="copy-str-btn">
+                                    <i class="fas fa-copy"></i> 复制
+                                </button>
+                            </div>
+                            <div class="result-value" id="str-result"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 随机列表 -->
+                    <div class="tab-content" id="lists">
+                        <div class="form-group">
+                            <label class="form-label" for="list-items">输入列表项 (每行一个):</label>
+                            <textarea class="form-input" id="list-items" rows="8" placeholder="在这里输入列表项，每行一个..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="list-quantity">选择数量:</label>
+                            <input type="number" class="form-input" id="list-quantity" min="1" value="1">
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="checkbox-input" id="list-unique">
+                                不重复选择
+                            </label>
+                        </div>
+                        
+                        <button class="btn" id="generate-list-btn">
+                            <i class="fas fa-random"></i> 随机选择
+                        </button>
+                        
+                        <div class="result-container" id="list-result-container" style="display: none;">
+                            <div class="result-title">
+                                <span>随机选择结果:</span>
+                                <button class="copy-btn" id="copy-list-btn">
+                                    <i class="fas fa-copy"></i> 复制
+                                </button>
+                            </div>
+                            <div class="result-value" id="list-result"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="history-container">
+                    <h3 class="history-title">历史结果</h3>
+                    <div class="history-grid" id="history-grid">
+                        <!-- 历史记录将通过JavaScript动态添加 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        <p class="copyright">© 2025 Dreamirage Tool - 版权所有 | 保留所有权利</p>
+    </footer>
+    
+    <script>
+        // DOM元素
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // 随机数字
+        const numMin = document.getElementById('num-min');
+        const numMax = document.getElementById('num-max');
+        const numQuantity = document.getElementById('num-quantity');
+        const numUnique = document.getElementById('num-unique');
+        const numSort = document.getElementById('num-sort');
+        const generateNumBtn = document.getElementById('generate-num-btn');
+        const numResultContainer = document.getElementById('num-result-container');
+        const numResult = document.getElementById('num-result');
+        const copyNumBtn = document.getElementById('copy-num-btn');
+        
+        // 随机字符串
+        const strLength = document.getElementById('str-length');
+        const strQuantity = document.getElementById('str-quantity');
+        const strUppercase = document.getElementById('str-uppercase');
+        const strLowercase = document.getElementById('str-lowercase');
+        const strNumbers = document.getElementById('str-numbers');
+        const strSymbols = document.getElementById('str-symbols');
+        const generateStrBtn = document.getElementById('generate-str-btn');
+        const strResultContainer = document.getElementById('str-result-container');
+        const strResult = document.getElementById('str-result');
+        const copyStrBtn = document.getElementById('copy-str-btn');
+        
+        // 随机列表
+        const listItems = document.getElementById('list-items');
+        const listQuantity = document.getElementById('list-quantity');
+        const listUnique = document.getElementById('list-unique');
+        const generateListBtn = document.getElementById('generate-list-btn');
+        const listResultContainer = document.getElementById('list-result-container');
+        const listResult = document.getElementById('list-result');
+        const copyListBtn = document.getElementById('copy-list-btn');
+        
+        // 历史记录
+        const historyGrid = document.getElementById('history-grid');
+        let historyItems = [];
+        const maxHistoryItems = 9;
+        
+        // 标签切换
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有活动状态
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // 添加当前活动状态
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // 生成随机数字
+        generateNumBtn.addEventListener('click', () => {
+            const min = parseInt(numMin.value);
+            const max = parseInt(numMax.value);
+            const quantity = parseInt(numQuantity.value);
+            const unique = numUnique.checked;
+            const sort = numSort.checked;
+            
+            // 验证输入
+            if (isNaN(min) || isNaN(max) || isNaN(quantity)) {
+                alert('请输入有效的数字');
+                return;
+            }
+            
+            if (min > max) {
+                alert('最小值不能大于最大值');
+                return;
+            }
+            
+            if (quantity < 1 || quantity > 100) {
+                alert('生成数量应在1-100之间');
+                return;
+            }
+            
+            if (unique && (max - min + 1) < quantity) {
+                alert(`在${min}到${max}之间不能生成${quantity}个不重复的数字`);
+                return;
+            }
+            
+            // 生成随机数字
+            let result = [];
+            
+            if (unique) {
+                // 不重复的随机数
+                const numbers = [];
+                for (let i = min; i <= max; i++) {
+                    numbers.push(i);
+                }
+                
+                // 洗牌算法
+                for (let i = numbers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+                }
+                
+                result = numbers.slice(0, quantity);
+            } else {
+                // 可重复的随机数
+                for (let i = 0; i < quantity; i++) {
+                    const random = Math.floor(Math.random() * (max - min + 1)) + min;
+                    result.push(random);
+                }
+            }
+            
+            // 排序（如果需要）
+            if (sort) {
+                result.sort((a, b) => a - b);
+            }
+            
+            // 显示结果
+            numResult.textContent = result.join(', ');
+            numResultContainer.style.display = 'block';
+            
+            // 添加到历史记录
+            addToHistory(result.join(', '));
+        });
+        
+        // 生成随机字符串
+        generateStrBtn.addEventListener('click', () => {
+            const length = parseInt(strLength.value);
+            const quantity = parseInt(strQuantity.value);
+            const useUppercase = strUppercase.checked;
+            const useLowercase = strLowercase.checked;
+            const useNumbers = strNumbers.checked;
+            const useSymbols = strSymbols.checked;
+            
+            // 验证输入
+            if (isNaN(length) || isNaN(quantity)) {
+                alert('请输入有效的数字');
+                return;
+            }
+            
+            if (length < 1 || length > 100) {
+                alert('字符串长度应在1-100之间');
+                return;
+            }
+            
+            if (quantity < 1 || quantity > 20) {
+                alert('生成数量应在1-20之间');
+                return;
+            }
+            
+            if (!useUppercase && !useLowercase && !useNumbers && !useSymbols) {
+                alert('请至少选择一种字符类型');
+                return;
+            }
+            
+            // 构建字符集
+            let charset = '';
+            if (useUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (useLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (useNumbers) charset += '0123456789';
+            if (useSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            // 生成随机字符串
+            const result = [];
+            
+            for (let i = 0; i < quantity; i++) {
+                let randomStr = '';
+                for (let j = 0; j < length; j++) {
+                    const randomIndex = Math.floor(Math.random() * charset.length);
+                    randomStr += charset.charAt(randomIndex);
+                }
+                result.push(randomStr);
+            }
+            
+            // 显示结果
+            strResult.textContent = result.join('\n');
+            strResultContainer.style.display = 'block';
+            
+            // 添加到历史记录
+            addToHistory(result.join(', '));
+        });
+        
+        // 生成随机列表
+        generateListBtn.addEventListener('click', () => {
+            const items = listItems.value.trim().split('\n').filter(item => item.trim() !== '');
+            const quantity = parseInt(listQuantity.value);
+            const unique = listUnique.checked;
+            
+            // 验证输入
+            if (items.length === 0) {
+                alert('请输入至少一个列表项');
+                return;
+            }
+            
+            if (isNaN(quantity) || quantity < 1) {
+                alert('请输入有效的选择数量');
+                return;
+            }
+            
+            if (unique && items.length < quantity) {
+                alert(`列表中只有${items.length}个项目，不能选择${quantity}个不重复的项目`);
+                return;
+            }
+            
+            // 生成随机选择
+            let result = [];
+            
+            if (unique) {
+                // 不重复选择
+                const shuffled = [...items];
+                
+                // 洗牌算法
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                
+                result = shuffled.slice(0, quantity);
+            } else {
+                // 可重复选择
+                for (let i = 0; i < quantity; i++) {
+                    const randomIndex = Math.floor(Math.random() * items.length);
+                    result.push(items[randomIndex]);
+                }
+            }
+            
+            // 显示结果
+            listResult.textContent = result.join('\n');
+            listResultContainer.style.display = 'block';
+            
+            // 添加到历史记录
+            addToHistory(result.join(', '));
+        });
+        
+        // 复制结果
+        copyNumBtn.addEventListener('click', () => {
+            copyToClipboard(numResult.textContent);
+        });
+        
+        copyStrBtn.addEventListener('click', () => {
+            copyToClipboard(strResult.textContent);
+        });
+        
+        copyListBtn.addEventListener('click', () => {
+            copyToClipboard(listResult.textContent);
+        });
+        
+        // 复制到剪贴板
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('已复制到剪贴板');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                alert('复制失败，请手动复制');
+            });
+        }
+        
+        // 添加到历史记录
+        function addToHistory(result) {
+            // 限制结果长度
+            const shortResult = result.length > 50 ? result.substring(0, 47) + '...' : result;
+            
+            // 添加到数组前面
+            historyItems.unshift(shortResult);
+            
+            // 限制历史记录数量
+            if (historyItems.length > maxHistoryItems) {
+                historyItems.pop();
+            }
+            
+            // 更新历史UI
+            updateHistoryUI();
+        }
+        
+        // 更新历史记录UI
+        function updateHistoryUI() {
+            historyGrid.innerHTML = '';
+            
+            historyItems.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.textContent = item;
+                historyItem.title = item;
+                
+                historyItem.addEventListener('click', () => {
+                    copyToClipboard(item);
+                });
+                
+                historyGrid.appendChild(historyItem);
+            });
+        }
+        
+        // 添加一些示例列表项
+        listItems.value = '苹果\n香蕉\n橙子\n葡萄\n西瓜\n芒果\n草莓\n蓝莓\n樱桃\n柠檬';
+    </script>
+</body>
+</html> 

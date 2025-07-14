@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本大小写转换 - Dreamirage Tool</title>
+    <meta name="description" content="快速转换文本大小写，支持多种格式">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 使用本地MiSans字体，不再引用Google Fonts */
+        
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'MiSans', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .home-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .home-btn i {
+            margin-right: 6px;
+        }
+        
+        .home-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .text-container {
+            margin-bottom: 25px;
+        }
+        
+        .text-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        
+        .text-area {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: var(--transition);
+        }
+        
+        .text-area:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .conversion-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .conversion-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .conversion-options {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .option-btn {
+            padding: 12px 15px;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .option-btn i {
+            font-size: 18px;
+        }
+        
+        .option-btn:hover {
+            background-color: rgba(67, 97, 238, 0.2);
+        }
+        
+        .option-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .action-btn i {
+            margin-right: 8px;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .action-btn.secondary {
+            background-color: #6c757d;
+        }
+        
+        .action-btn.secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .text-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 10px 15px;
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 6px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .footer {
+            background-color: var(--card-bg);
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+            margin-top: auto;
+        }
+        
+        .copyright {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .sample-texts {
+            margin-top: 30px;
+        }
+        
+        .sample-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .sample-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .sample-link {
+            padding: 6px 12px;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .sample-link:hover {
+            background-color: rgba(67, 97, 238, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="../index.html" class="logo-container">
+                <img src="../img/logo.png" alt="Dreamirage Logo" class="logo">
+                <h1 class="title">文本大小写转换</h1>
+            </a>
+            <a href="../index.html" class="home-btn">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2 class="card-title">文本大小写转换工具</h2>
+                
+                <div class="text-container">
+                    <label for="input-text" class="text-label">输入文本:</label>
+                    <textarea id="input-text" class="text-area" placeholder="在此处输入或粘贴文本..."></textarea>
+                </div>
+                
+                <div class="text-info">
+                    <div class="info-item">
+                        <span class="info-label">字符数</span>
+                        <span class="info-value" id="char-count">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">单词数</span>
+                        <span class="info-value" id="word-count">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">行数</span>
+                        <span class="info-value" id="line-count">0</span>
+                    </div>
+                </div>
+                
+                <div class="conversion-options">
+                    <button class="option-btn" id="lowercase-btn">
+                        <i class="fas fa-font"></i>
+                        <span>小写</span>
+                    </button>
+                    <button class="option-btn" id="uppercase-btn">
+                        <i class="fas fa-font"></i>
+                        <span>大写</span>
+                    </button>
+                    <button class="option-btn" id="capitalize-btn">
+                        <i class="fas fa-font"></i>
+                        <span>首字母大写</span>
+                    </button>
+                    <button class="option-btn" id="sentence-case-btn">
+                        <i class="fas fa-paragraph"></i>
+                        <span>句首大写</span>
+                    </button>
+                    <button class="option-btn" id="title-case-btn">
+                        <i class="fas fa-heading"></i>
+                        <span>标题格式</span>
+                    </button>
+                    <button class="option-btn" id="alternating-case-btn">
+                        <i class="fas fa-random"></i>
+                        <span>交替大小写</span>
+                    </button>
+                    <button class="option-btn" id="inverse-case-btn">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>反转大小写</span>
+                    </button>
+                    <button class="option-btn" id="camel-case-btn">
+                        <i class="fas fa-code"></i>
+                        <span>驼峰命名法</span>
+                    </button>
+                    <button class="option-btn" id="pascal-case-btn">
+                        <i class="fas fa-code"></i>
+                        <span>帕斯卡命名法</span>
+                    </button>
+                    <button class="option-btn" id="snake-case-btn">
+                        <i class="fas fa-code"></i>
+                        <span>蛇形命名法</span>
+                    </button>
+                    <button class="option-btn" id="kebab-case-btn">
+                        <i class="fas fa-code"></i>
+                        <span>短横线命名法</span>
+                    </button>
+                    <button class="option-btn" id="remove-spaces-btn">
+                        <i class="fas fa-compress-alt"></i>
+                        <span>移除空格</span>
+                    </button>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn" id="copy-btn">
+                        <i class="fas fa-copy"></i> 复制结果
+                    </button>
+                    <button class="action-btn secondary" id="clear-btn">
+                        <i class="fas fa-trash-alt"></i> 清空文本
+                    </button>
+                </div>
+                
+                <div class="sample-texts">
+                    <h3 class="sample-title">示例文本:</h3>
+                    <div class="sample-list">
+                        <div class="sample-link" id="sample-lorem">英文段落</div>
+                        <div class="sample-link" id="sample-chinese">中文段落</div>
+                        <div class="sample-link" id="sample-mixed">混合文本</div>
+                        <div class="sample-link" id="sample-code">代码示例</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        <p class="copyright">© 2025 Dreamirage Tool - 版权所有 | 保留所有权利</p>
+    </footer>
+    
+    <script>
+        // DOM元素
+        const inputText = document.getElementById('input-text');
+        const charCount = document.getElementById('char-count');
+        const wordCount = document.getElementById('word-count');
+        const lineCount = document.getElementById('line-count');
+        const lowercaseBtn = document.getElementById('lowercase-btn');
+        const uppercaseBtn = document.getElementById('uppercase-btn');
+        const capitalizeBtn = document.getElementById('capitalize-btn');
+        const sentenceCaseBtn = document.getElementById('sentence-case-btn');
+        const titleCaseBtn = document.getElementById('title-case-btn');
+        const alternatingCaseBtn = document.getElementById('alternating-case-btn');
+        const inverseCaseBtn = document.getElementById('inverse-case-btn');
+        const camelCaseBtn = document.getElementById('camel-case-btn');
+        const pascalCaseBtn = document.getElementById('pascal-case-btn');
+        const snakeCaseBtn = document.getElementById('snake-case-btn');
+        const kebabCaseBtn = document.getElementById('kebab-case-btn');
+        const removeSpacesBtn = document.getElementById('remove-spaces-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const sampleLorem = document.getElementById('sample-lorem');
+        const sampleChinese = document.getElementById('sample-chinese');
+        const sampleMixed = document.getElementById('sample-mixed');
+        const sampleCode = document.getElementById('sample-code');
+        
+        // 更新文本统计信息
+        function updateTextInfo() {
+            const text = inputText.value;
+            
+            // 字符数（包括空格）
+            charCount.textContent = text.length;
+            
+            // 单词数（简单计算，按空格分割）
+            const words = text.trim().split(/\s+/);
+            wordCount.textContent = text.trim() === '' ? 0 : words.length;
+            
+            // 行数
+            const lines = text.split('\n');
+            lineCount.textContent = text === '' ? 0 : lines.length;
+        }
+        
+        // 转换为小写
+        lowercaseBtn.addEventListener('click', () => {
+            inputText.value = inputText.value.toLowerCase();
+            updateTextInfo();
+        });
+        
+        // 转换为大写
+        uppercaseBtn.addEventListener('click', () => {
+            inputText.value = inputText.value.toUpperCase();
+            updateTextInfo();
+        });
+        
+        // 首字母大写
+        capitalizeBtn.addEventListener('click', () => {
+            inputText.value = inputText.value.toLowerCase().replace(/(?:^|\s)\S/g, function(a) {
+                return a.toUpperCase();
+            });
+            updateTextInfo();
+        });
+        
+        // 句首大写
+        sentenceCaseBtn.addEventListener('click', () => {
+            inputText.value = inputText.value.toLowerCase().replace(/(^\s*|[.!?]\s+)\S/g, function(a) {
+                return a.toUpperCase();
+            });
+            updateTextInfo();
+        });
+        
+        // 标题格式（每个单词首字母大写，排除冠词等小词）
+        titleCaseBtn.addEventListener('click', () => {
+            const smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|nor|of|on|or|per|the|to|vs?\.?|via)$/i;
+            
+            inputText.value = inputText.value.toLowerCase().replace(/[A-Za-z0-9\u00C0-\u00FF]+[^\s-]*/g, function(match, index, title) {
+                if (index > 0 && index + match.length !== title.length &&
+                    match.search(smallWords) > -1 && title.charAt(index - 2) !== ":" && 
+                    (title.charAt(index - 1) !== '-' || title.charAt(index - 1) === '-' && title.charAt(index - 2) === '-') &&
+                    title.charAt(index - 1).search(/[^\s-]/) < 0) {
+                    return match.toLowerCase();
+                }
+                
+                if (match.substr(1).search(/[A-Z]|\../) > -1) {
+                    return match;
+                }
+                
+                return match.charAt(0).toUpperCase() + match.substr(1);
+            });
+            
+            updateTextInfo();
+        });
+        
+        // 交替大小写
+        alternatingCaseBtn.addEventListener('click', () => {
+            let result = '';
+            for (let i = 0; i < inputText.value.length; i++) {
+                if (i % 2 === 0) {
+                    result += inputText.value[i].toLowerCase();
+                } else {
+                    result += inputText.value[i].toUpperCase();
+                }
+            }
+            inputText.value = result;
+            updateTextInfo();
+        });
+        
+        // 反转大小写
+        inverseCaseBtn.addEventListener('click', () => {
+            let result = '';
+            for (let i = 0; i < inputText.value.length; i++) {
+                const char = inputText.value[i];
+                if (char === char.toUpperCase()) {
+                    result += char.toLowerCase();
+                } else {
+                    result += char.toUpperCase();
+                }
+            }
+            inputText.value = result;
+            updateTextInfo();
+        });
+        
+        // 驼峰命名法
+        camelCaseBtn.addEventListener('click', () => {
+            inputText.value = inputText.value
+                .replace(/[^a-zA-Z0-9\s]/g, '')
+                .replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+                    return index === 0 ? word.toLowerCase() : word.toUpperCase();
+                })
+                .replace(/\s+/g, '');
+            updateTextInfo();
+        });
+        
+        // 帕斯卡命名法
+        pascalCaseBtn.addEventListener('click', () => {
+            inputText.value = inputText.value
+                .replace(/[^a-zA-Z0-9\s]/g, '')
+                .replace(/(?:^\w|[A-Z]|\b\w)/g, function(word) {
+                    return word.toUpperCase();
+                })
+                .replace(/\s+/g, '');
+            updateTextInfo();
+        });
+        
+        // 蛇形命名法
+        snakeCaseBtn.addEventListener('click', () => {
+            inputText.value = inputText.value
+                .replace(/\s+/g, '_')
+                .replace(/[^a-zA-Z0-9_]/g, '')
+                .toLowerCase();
+            updateTextInfo();
+        });
+        
+        // 短横线命名法
+        kebabCaseBtn.addEventListener('click', () => {
+            inputText.value = inputText.value
+                .replace(/\s+/g, '-')
+                .replace(/[^a-zA-Z0-9-]/g, '')
+                .toLowerCase();
+            updateTextInfo();
+        });
+        
+        // 移除空格
+        removeSpacesBtn.addEventListener('click', () => {
+            inputText.value = inputText.value.replace(/\s+/g, '');
+            updateTextInfo();
+        });
+        
+        // 复制结果
+        copyBtn.addEventListener('click', () => {
+            inputText.select();
+            document.execCommand('copy');
+            alert('文本已复制到剪贴板');
+        });
+        
+        // 清空文本
+        clearBtn.addEventListener('click', () => {
+            inputText.value = '';
+            updateTextInfo();
+        });
+        
+        // 示例文本
+        sampleLorem.addEventListener('click', () => {
+            inputText.value = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
+            updateTextInfo();
+        });
+        
+        sampleChinese.addEventListener('click', () => {
+            inputText.value = `春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。
+
+床前明月光，疑是地上霜。举头望明月，低头思故乡。
+
+远上寒山石径斜，白云生处有人家。停车坐爱枫林晚，霜叶红于二月花。`;
+            updateTextInfo();
+        });
+        
+        sampleMixed.addEventListener('click', () => {
+            inputText.value = `Web开发(Web Development)是一个广泛的术语，指的是开发网站的工作。这可能包括Web设计、Web内容开发、客户端/服务器端脚本、Web服务器配置、电子商务开发和内容管理系统等方面。
+
+HTML（超文本标记语言）、CSS（层叠样式表）和JavaScript是Web开发的三大核心技术。HTML提供网页的结构，CSS控制格式和布局，而JavaScript则提供动态和交互功能。
+
+现代Web开发还包括使用各种框架和库，如React, Vue.js, Angular等前端框架，以及Node.js, Django, Ruby on Rails等后端框架。`;
+            updateTextInfo();
+        });
+        
+        sampleCode.addEventListener('click', () => {
+            inputText.value = `function calculateTotalPrice(items) {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        total += item.price * item.quantity;
+    }
+    return total;
+}
+
+const shoppingCart = [
+    { name: "Laptop", price: 999.99, quantity: 1 },
+    { name: "Mouse", price: 29.99, quantity: 2 },
+    { name: "Keyboard", price: 79.99, quantity: 1 }
+];
+
+const totalPrice = calculateTotalPrice(shoppingCart);
+console.log("Total price: $" + totalPrice.toFixed(2));`;
+            updateTextInfo();
+        });
+        
+        // 输入文本时更新统计信息
+        inputText.addEventListener('input', updateTextInfo);
+        
+        // 初始化
+        updateTextInfo();
+    </script>
+</body>
+</html> 
