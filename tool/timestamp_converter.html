@@ -6,8 +6,8 @@
     <title>时间戳转换工具 - Dreamirage Tool</title>
     <meta name="description" content="在时间戳和人类可读时间格式之间轻松转换">
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="img/logo.png" type="image/png">
     <style>
-        /* 使用本地MiSans字体，不再引用Google Fonts */
         
         :root {
             --primary-color: #4361ee;
@@ -299,7 +299,6 @@
                     <div class="converter-tab" data-type="date-to-timestamp">日期时间转时间戳</div>
                 </div>
                 
-                <!-- 时间戳转日期时间 -->
                 <div class="converter-container active" id="timestamp-to-date">
                     <div class="form-group">
                         <label for="timestamp-input">输入时间戳:</label>
@@ -326,7 +325,6 @@
                     </div>
                 </div>
                 
-                <!-- 日期时间转时间戳 -->
                 <div class="converter-container" id="date-to-timestamp">
                     <div class="form-group">
                         <label for="date-input">选择日期和时间:</label>
@@ -360,38 +358,31 @@
     </footer>
     
     <script>
-        // 更新当前时间戳
         function updateCurrentTimestamp() {
             const now = Math.floor(Date.now() / 1000);
             document.getElementById('current-timestamp').textContent = now;
         }
         
-        // 每秒更新一次当前时间戳
         updateCurrentTimestamp();
         setInterval(updateCurrentTimestamp, 1000);
         
-        // 转换器标签切换
         const converterTabs = document.querySelectorAll('.converter-tab');
         const converterContainers = document.querySelectorAll('.converter-container');
         
         converterTabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                // 移除所有活动状态
                 converterTabs.forEach(t => t.classList.remove('active'));
                 converterContainers.forEach(c => c.classList.remove('active'));
                 
-                // 添加当前活动状态
                 tab.classList.add('active');
                 const type = tab.getAttribute('data-type');
                 document.getElementById(type).classList.add('active');
                 
-                // 隐藏结果容器
                 document.getElementById('date-result-container').style.display = 'none';
                 document.getElementById('timestamp-result-container').style.display = 'none';
             });
         });
         
-        // 时间戳转日期时间
         document.getElementById('convert-to-date-btn').addEventListener('click', () => {
             const timestampInput = document.getElementById('timestamp-input').value.trim();
             const timestampUnit = document.getElementById('timestamp-unit').value;
@@ -408,20 +399,16 @@
                 return;
             }
             
-            // 如果是毫秒，转换为秒
             if (timestampUnit === 'seconds') {
-                // 如果是秒，但是输入的是13位（可能是毫秒），自动转换
                 if (timestampInput.length === 13) {
                     timestamp = Math.floor(timestamp / 1000);
                 }
             } else {
-                // 如果输入的是秒（10位左右），但选择了毫秒单位，自动转换
                 if (timestampInput.length <= 10) {
                     timestamp = timestamp * 1000;
                 }
             }
             
-            // 创建日期对象
             const date = new Date(timestampUnit === 'seconds' ? timestamp * 1000 : timestamp);
             
             if (date.toString() === 'Invalid Date') {
@@ -429,7 +416,6 @@
                 return;
             }
             
-            // 格式化日期时间
             const formattedDate = date.toLocaleString('zh-CN', {
                 year: 'numeric',
                 month: '2-digit',
@@ -440,7 +426,6 @@
                 hour12: false
             });
             
-            // 显示时区信息
             const timezoneOffset = date.getTimezoneOffset();
             const timezoneHours = Math.abs(Math.floor(timezoneOffset / 60));
             const timezoneMinutes = Math.abs(timezoneOffset % 60);
@@ -451,7 +436,6 @@
             document.getElementById('date-result-container').style.display = 'block';
         });
         
-        // 日期时间转时间戳
         document.getElementById('convert-to-timestamp-btn').addEventListener('click', () => {
             const dateInput = document.getElementById('date-input').value;
             const outputUnit = document.getElementById('output-timestamp-unit').value;
@@ -468,7 +452,6 @@
             document.getElementById('timestamp-result-container').style.display = 'block';
         });
         
-        // 复制功能
         document.getElementById('copy-date-btn').addEventListener('click', () => {
             const result = document.getElementById('date-result').textContent;
             navigator.clipboard.writeText(result).then(() => {
@@ -483,7 +466,6 @@
             });
         });
         
-        // 设置默认日期时间为当前时间
         const now = new Date();
         const year = now.getFullYear();
         const month = (now.getMonth() + 1).toString().padStart(2, '0');

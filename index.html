@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dreamirage Tool - 官方工具箱</title>
+    <link rel="icon" href="img/logo.png" type="image/png">
     <meta name="keywords" content="计算器,工具箱,Dreamirage,多功能计算器,在线工具,程序员计算器,时间转换,单位换算,免费在线工具,网页工具,实用工具,在线计算,金融工具,Dreamirage Tool,PDF转换器">
     <meta name="description" content="Dreamirage Tool官方工具箱，提供计算器等多种实用工具，助力高效工作与生活">
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
@@ -84,6 +85,8 @@
             border-radius: 20px;
             padding: 40px 20px;
             perspective: 1000px;
+            position: relative;
+            overflow: hidden;
         }
         
         .logo {
@@ -117,6 +120,8 @@
         .header .subtitle {
             opacity: 0;
             transition: transform 0.1s ease-out;
+            position: relative;
+            z-index: 1;
         }
 
         .loaded .header .logo {
@@ -379,6 +384,15 @@
             transform: translateY(0);
         }
         
+        #header-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
         .disabled-tool {
             opacity: 0.7;
             position: relative;
@@ -426,6 +440,7 @@
     
     <div class="container">
         <div class="header">
+            <canvas id="header-canvas"></canvas>
             <img src="img/logo.png" alt="Dreamirage Logo" class="logo">
             <h1 class="title">Dreamirage Tool官方工具箱</h1>
             <p class="subtitle">一站式在线工具集合，提升您的工作效率和日常生活便利性</p>
@@ -434,7 +449,6 @@
         <h2 class="section-title">实用工具</h2>
         
         <div class="tools-grid" id="tools-grid">
-            <!-- 工具卡片将由JS动态生成 -->
         </div>
     </div>
          
@@ -566,14 +580,11 @@
             }
         ];
 
-        // 初始化工具数据并渲染
         function initializeTools() {
             try {
-                // 尝试从localStorage加载后台管理系统的工具数据
                 const savedToolsData = localStorage.getItem('dreamirage_tools_data');
                 if (savedToolsData) {
                     try {
-                        // 使用完整保存的工具数据替换本地工具数据
                         const parsedData = JSON.parse(savedToolsData);
                         if (Array.isArray(parsedData) && parsedData.length > 0) {
                             toolsData = parsedData;
@@ -590,8 +601,6 @@
                 if(grid) grid.innerHTML = '<p style="text-align: center; color: var(--text-light);">初始化工具列表失败，请刷新页面重试。</p>';
             }
         }
-
-        // 渲染工具卡片
         function renderTools() {
             const grid = document.getElementById('tools-grid');
             if (!grid) return;
@@ -623,8 +632,6 @@
 
             setupToolLinks();
         }
-
-        // 设置工具链接点击事件
         function setupToolLinks() {
             document.querySelectorAll('.tool-card').forEach(card => {
                 card.addEventListener('click', function(e) {
@@ -648,8 +655,7 @@
                 });         
             }); 
         }
-        
-        // 显示工具状态消息
+
         function showToolStatusMessage(tool) {
             if (!tool) return;
                 
@@ -716,17 +722,14 @@
                 }
             });
         }
-        
-        // 页面加载效果
+
         document.addEventListener('DOMContentLoaded', function() {
-            // 加载工具数据并生成列表
             initializeTools();
             
             setTimeout(() => {
                 document.body.classList.add('loaded');
             }, 300);
-            
-            // 返回顶部按钮
+
             const backToTopBtn = document.querySelector('.back-to-top');
             
             window.addEventListener('scroll', function() {
@@ -743,8 +746,7 @@
                     behavior: 'smooth'
                 });
             });
-            
-            // 头部交互效果
+
             const header = document.querySelector('.header');
             if (header) {
                 const logo = header.querySelector('.logo');
@@ -778,8 +780,6 @@
                     if(subtitle) subtitle.style.transform = '';
                 });
             }
-
-            // 监听localStorage变化，实现实时同步
             window.addEventListener('storage', function(e) {
                 if (e.key === 'dreamirage_tools_data') {
                     try {
@@ -793,6 +793,60 @@
                     }
                 }
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('header-canvas');
+            const ctx = canvas.getContext('2d');
+            let headerRect = canvas.parentElement.getBoundingClientRect();
+            let mouse = { x: headerRect.width / 2, y: headerRect.height / 2 };
+            let targetMouse = { x: headerRect.width / 2, y: headerRect.height / 2 };
+
+            function resizeCanvas() {
+                headerRect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = headerRect.width;
+                canvas.height = headerRect.height;
+                targetMouse.x = canvas.width / 2;
+                targetMouse.y = canvas.height / 2;
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                mouse.x += (targetMouse.x - mouse.x) * 0.05;
+                mouse.y += (targetMouse.y - mouse.y) * 0.05;
+
+                const gradientRadius = Math.min(canvas.width, canvas.height) / 2;
+                const intensity = (Math.sin(Date.now() / 500) * 0.02) + 0.1;
+
+                const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, gradientRadius);
+                gradient.addColorStop(0, `rgba(173, 216, 230, ${intensity})`);
+                gradient.addColorStop(0.8, `rgba(173, 216, 230, ${intensity * 0.2})`);
+                gradient.addColorStop(1, 'rgba(173, 216, 230, 0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(mouse.x, mouse.y, gradientRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                requestAnimationFrame(animate);
+            }
+
+            canvas.parentElement.addEventListener('mousemove', e => {
+                const rect = canvas.getBoundingClientRect();
+                targetMouse.x = e.clientX - rect.left;
+                targetMouse.y = e.clientY - rect.top;
+            });
+
+            canvas.parentElement.addEventListener('mouseleave', () => {
+                targetMouse.x = canvas.width / 2;
+                targetMouse.y = canvas.height / 2;
+            });
+
+            window.addEventListener('resize', resizeCanvas);
+            
+            resizeCanvas();
+            animate();
         });
     </script>
 </body>

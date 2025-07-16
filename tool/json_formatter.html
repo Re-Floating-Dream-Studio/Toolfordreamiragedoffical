@@ -6,6 +6,7 @@
     <title>JSON格式化工具 - Dreamirage Tool</title>
     <meta name="description" content="轻松格式化、验证和美化JSON数据">
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="img/logo.png" type="image/png">
     <style>
         :root {
             --primary-color: #4361ee;
@@ -405,7 +406,7 @@
     </footer>
     
     <script>
-        // DOM元素
+
         const jsonInput = document.getElementById('json-input');
         const formatBtn = document.getElementById('format-btn');
         const validateBtn = document.getElementById('validate-btn');
@@ -414,14 +415,12 @@
         const clearBtn = document.getElementById('clear-btn');
         const indentSelect = document.getElementById('indent-select');
         const statusDiv = document.getElementById('status');
-        
-        // 示例JSON
+
         const sampleSimple = document.getElementById('sample-simple');
         const sampleArray = document.getElementById('sample-array');
         const sampleNested = document.getElementById('sample-nested');
         const sampleComplex = document.getElementById('sample-complex');
-        
-        // 格式化JSON
+
         formatBtn.addEventListener('click', () => {
             const json = jsonInput.value.trim();
             if (!json) {
@@ -439,8 +438,7 @@
                 showStatus(`格式化失败: ${error.message}`, false);
             }
         });
-        
-        // 验证JSON
+
         validateBtn.addEventListener('click', () => {
             const json = jsonInput.value.trim();
             if (!json) {
@@ -455,8 +453,7 @@
                 showStatus(`验证失败: ${error.message}`, false);
             }
         });
-        
-        // 压缩JSON
+
         minifyBtn.addEventListener('click', () => {
             const json = jsonInput.value.trim();
             if (!json) {
@@ -473,8 +470,7 @@
                 showStatus(`压缩失败: ${error.message}`, false);
             }
         });
-        
-        // 复制JSON
+
         copyBtn.addEventListener('click', () => {
             const json = jsonInput.value.trim();
             if (!json) {
@@ -488,26 +484,22 @@
                 showStatus('复制失败，请手动复制', false);
             });
         });
-        
-        // 清空输入框
+
         clearBtn.addEventListener('click', () => {
             jsonInput.value = '';
             statusDiv.style.display = 'none';
         });
-        
-        // 显示状态信息
+
         function showStatus(message, isValid) {
             statusDiv.textContent = message;
             statusDiv.className = isValid ? 'status valid' : 'status invalid';
         }
-        
-        // 获取缩进值
+
         function getIndentValue() {
             const value = indentSelect.value;
             return value === 'tab' ? '\t' : parseInt(value);
         }
-        
-        // 示例JSON
+
         sampleSimple.addEventListener('click', () => {
             const simpleJson = {
                 "name": "张三",
@@ -637,8 +629,7 @@
             };
             jsonInput.value = JSON.stringify(complexJson, null, 4);
         });
-        
-        // 自动格式化输入的JSON
+
         jsonInput.addEventListener('blur', () => {
             const json = jsonInput.value.trim();
             if (json) {
@@ -649,7 +640,6 @@
                     jsonInput.value = formatted;
                     statusDiv.style.display = 'none';
                 } catch (error) {
-                    // 如果不是有效的JSON，不做处理
                 }
             }
         });

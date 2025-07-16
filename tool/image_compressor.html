@@ -6,9 +6,9 @@
     <title>图片压缩工具 - Dreamirage Tool</title>
     <meta name="description" content="压缩图片文件大小，保持合理的图像质量">
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="img/logo.png" type="image/png">
     <style>
-        /* 使用本地MiSans字体，不再引用Google Fonts */
-        
+
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
@@ -479,7 +479,6 @@
                 <div class="results-container" id="results-container">
                     <h3 class="results-title">压缩结果</h3>
                     <div class="results-grid" id="results-grid">
-                        <!-- 结果将通过JavaScript动态添加 -->
                     </div>
                 </div>
             </div>
@@ -491,7 +490,7 @@
     </footer>
     
     <script>
-        // DOM元素
+
         const dropArea = document.getElementById('drop-area');
         const fileInput = document.getElementById('file-input');
         const browseBtn = document.getElementById('browse-btn');
@@ -506,26 +505,21 @@
         const progressText = document.getElementById('progress-text');
         const resultsContainer = document.getElementById('results-container');
         const resultsGrid = document.getElementById('results-grid');
-        
-        // 存储选择的文件
+
         let files = [];
-        
-        // 显示质量值
+
         qualitySlider.addEventListener('input', () => {
             qualityValue.textContent = `${qualitySlider.value}%`;
         });
-        
-        // 点击浏览按钮
+
         browseBtn.addEventListener('click', () => {
             fileInput.click();
         });
-        
-        // 文件选择处理
+
         fileInput.addEventListener('change', () => {
             handleFiles(fileInput.files);
         });
-        
-        // 拖放区域事件
+
         dropArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropArea.classList.add('active');
@@ -542,31 +536,26 @@
             const droppedFiles = e.dataTransfer.files;
             handleFiles(droppedFiles);
         });
-        
-        // 处理选择的文件
+
         function handleFiles(selectedFiles) {
             files = [];
-            
-            // 检查每个文件
+
             for (let i = 0; i < selectedFiles.length; i++) {
                 const file = selectedFiles[i];
-                
-                // 检查文件类型
+
                 if (!file.type.match('image/jpeg') && !file.type.match('image/png') && !file.type.match('image/webp')) {
                     alert('只支持JPEG、PNG和WebP格式的图片');
                     continue;
                 }
-                
-                // 检查文件大小
+
                 if (file.size > 20 * 1024 * 1024) {
                     alert('文件大小不能超过20MB');
                     continue;
                 }
-                
+
                 files.push(file);
             }
-            
-            // 更新界面显示
+
             if (files.length > 0) {
                 const fileNames = files.map(file => file.name).join(', ');
                 dropArea.querySelector('.drag-text').textContent = `已选择 ${files.length} 个文件`;
@@ -577,39 +566,34 @@
                 compressBtn.disabled = true;
             }
         }
-        
-        // 重置拖放区域
+
         function resetDropArea() {
             dropArea.querySelector('.drag-text').textContent = '拖放图片到此处';
             dropArea.querySelector('.drag-hint').textContent = '支持格式: JPEG, PNG, WebP (最大20MB)';
         }
-        
-        // 压缩图片
+
         compressBtn.addEventListener('click', async () => {
             if (files.length === 0) return;
-            
-            // 显示进度条
+
             progressContainer.style.display = 'block';
             resultsContainer.style.display = 'none';
             resultsGrid.innerHTML = '';
             compressBtn.disabled = true;
-            
+
             const quality = parseInt(qualitySlider.value) / 100;
             const format = outputFormat.value;
             const maxWidthValue = maxWidth.value ? parseInt(maxWidth.value) : null;
             const maxHeightValue = maxHeight.value ? parseInt(maxHeight.value) : null;
-            
+
             const results = [];
-            
+
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const percentage = Math.round(((i + 1) / files.length) * 100);
-                
-                // 更新进度
+
                 progressFill.style.width = `${percentage}%`;
                 progressText.textContent = `正在处理... ${percentage}%`;
-                
-                // 压缩当前图片
+
                 try {
                     const result = await compressImage(file, quality, format, maxWidthValue, maxHeightValue);
                     results.push(result);
@@ -617,16 +601,13 @@
                     console.error('压缩图片失败:', error);
                 }
             }
-            
-            // 显示结果
+
             displayResults(results);
-            
-            // 隐藏进度条
+
             progressContainer.style.display = 'none';
             compressBtn.disabled = false;
         });
-        
-        // 压缩图片函数
+
         function compressImage(file, quality, format, maxWidth, maxHeight) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -635,7 +616,7 @@
                     const img = new Image();
                     
                     img.onload = function() {
-                        // 计算调整后的尺寸
+
                         let width = img.width;
                         let height = img.height;
                         
@@ -648,25 +629,20 @@
                             width = Math.floor(width * (maxHeight / height));
                             height = maxHeight;
                         }
-                        
-                        // 创建canvas
+
                         const canvas = document.createElement('canvas');
                         canvas.width = width;
                         canvas.height = height;
-                        
-                        // 绘制图片
+
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // 确定输出格式
+
                         let outputFormat = format === 'same' ? file.type : `image/${format}`;
-                        
-                        // 如果是PNG，确保使用PNG格式
+
                         if (format === 'png' || (format === 'same' && file.type === 'image/png')) {
                             outputFormat = 'image/png';
                         }
-                        
-                        // 导出压缩后的图片
+
                         canvas.toBlob(function(blob) {
                             resolve({
                                 name: file.name,
@@ -695,29 +671,24 @@
                 reader.readAsDataURL(file);
             });
         }
-        
-        // 显示结果
+
         function displayResults(results) {
             resultsContainer.style.display = 'block';
             resultsGrid.innerHTML = '';
             
             results.forEach(result => {
-                // 计算减少的百分比
                 const reductionPercent = Math.round((1 - (result.compressedSize / result.originalSize)) * 100);
-                
-                // 确定减少程度的级别
+
                 let reductionClass = 'low';
                 if (reductionPercent >= 50) {
                     reductionClass = 'high';
                 } else if (reductionPercent >= 30) {
                     reductionClass = 'medium';
                 }
-                
-                // 格式化文件大小
+
                 const originalSizeFormatted = formatFileSize(result.originalSize);
                 const compressedSizeFormatted = formatFileSize(result.compressedSize);
-                
-                // 创建结果卡片
+
                 const resultCard = document.createElement('div');
                 resultCard.className = 'result-card';
                 resultCard.innerHTML = `
@@ -739,8 +710,7 @@
                 resultsGrid.appendChild(resultCard);
             });
         }
-        
-        // 格式化文件大小
+
         function formatFileSize(bytes) {
             if (bytes < 1024) {
                 return bytes + ' B';
@@ -750,15 +720,12 @@
                 return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
             }
         }
-        
-        // 获取下载文件名
+
         function getDownloadFileName(result) {
-            // 从原始文件名中提取基本名称和扩展名
             const parts = result.name.split('.');
             const ext = parts.pop();
             const baseName = parts.join('.');
-            
-            // 确定新的扩展名
+
             let newExt;
             switch (result.compressedType) {
                 case 'image/jpeg':
@@ -773,8 +740,7 @@
                 default:
                     newExt = ext;
             }
-            
-            // 返回新的文件名
+
             return `${baseName}_compressed.${newExt}`;
         }
     </script>

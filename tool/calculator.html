@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dreamirage Tool - 计算器</title>
-    <!-- 添加jQuery库引用 -->
     <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="icon" href="img/logo.png" type="image/png">
     <style> 
         * {
             margin: 0;
@@ -1416,7 +1416,6 @@
             const scientificButtons = document.getElementById('scientific-buttons'); 
             const programmerButtons = document.getElementById('programmer-buttons');  
              
-            // 设置相关元素
             const settingsBtn = document.getElementById('settings-btn');
             const settingsPanel = document.getElementById('settings-panel');
             const closeSettings = document.getElementById('close-settings');
@@ -1428,13 +1427,11 @@
             const darkModeSwitch = document.getElementById('dark-mode-switch');
             const themeOptions = document.querySelectorAll('.theme-option');
             
-            // 主题下载相关元素
             const downloadContainer = document.getElementById('download-container');
             const circleProgress = document.getElementById('circle-progress');
             const progressText = document.getElementById('progress-text');
             const downloadMessage = document.getElementById('download-message');
             
-            // 主题资源
             const themeResources = {
                 rain: {
                     video: document.getElementById('rain-video'),
@@ -1448,7 +1445,6 @@
                 }
             };
             
-            // 初始化设置
             let decimalPlaces = 2;
             let calculatorSize = 350;
             let isDarkMode = false;
@@ -1461,7 +1457,6 @@
             let memory = 0;
             let lastAnswer = 0;
             
-            // 设置面板过渡
             function animateSettingsPanel(show) {
                 if (show) {
                     settingsPanel.style.opacity = '0';
@@ -1469,18 +1464,14 @@
                     settingsPanel.classList.add('active');
                     overlay.classList.add('active');
                     
-                    // 强制重绘
                     void settingsPanel.offsetWidth;
                     
-                    // 显示动画
                     settingsPanel.style.opacity = '1';
                     settingsPanel.style.transform = 'translate(-50%, -50%) scale(1)';
                 } else {
-                    // 隐藏动画
                     settingsPanel.style.opacity = '0';
                     settingsPanel.style.transform = 'translate(-50%, -45%) scale(0.95)';
                     
-                    // 动画完成后移除active类
                     setTimeout(() => {
                         settingsPanel.classList.remove('active');
                         overlay.classList.remove('active');
@@ -1488,7 +1479,6 @@
                 }
             }
             
-            // 检查主题是否已经下载
             function isThemeDownloaded(theme) {
                 return localStorage.getItem(`theme_${theme}_downloaded`) === 'true' || 
                        theme === 'light' || 
@@ -1496,20 +1486,17 @@
                        theme === 'milan';
             }
             
-            // 设置主题已下载
             function setThemeDownloaded(theme) {
                 localStorage.setItem(`theme_${theme}_downloaded`, 'true');
                 themeResources[theme].downloaded = true;
             }
             
-            // 模拟下载主题
             function downloadTheme(theme) {
                 if (isThemeDownloaded(theme)) {
                     applyTheme(theme);
                     return;
                 }
                 
-                // 显示对应主题的下载容器
                 const downloadContainer = document.getElementById(`${theme}-download-container`);
                 const circleProgress = document.getElementById(`${theme}-circle-progress`);
                 if (!downloadContainer || !circleProgress) return;
@@ -1518,27 +1505,21 @@
                 
                 const themeSize = themeResources[theme].size;
                 let downloaded = 0;
-                const downloadInterval = 100; // 每100ms更新一次
+                const downloadInterval = 100;
                 
                 const downloadTimer = setInterval(() => {
-                    // 随机增加一些进度（0.1到0.5 MB）
                     const increment = Math.random() * 0.4 + 0.1;
                     downloaded = Math.min(downloaded + increment, themeSize);
                     
-                    // 计算百分比
                     const percent = Math.floor((downloaded / themeSize) * 100);
                     
-                    // 更新圆环进度
                     circleProgress.style.background = `conic-gradient(#4d7cfe ${percent}%, transparent ${percent}%)`;
                     
-                    // 下载完成
                     if (downloaded >= themeSize) {
                         clearInterval(downloadTimer);
-                        
-                        // 设置已下载状态
+
                         setThemeDownloaded(theme);
-                        
-                        // 隐藏下载界面并应用主题
+
                         setTimeout(() => {
                             downloadContainer.style.display = 'none';
                             applyTheme(theme);
@@ -1547,14 +1528,12 @@
                 }, downloadInterval);
             }
             
-            // 应用主题
             function applyTheme(theme) {
                 document.body.classList.remove('dark-mode', 'rain-theme', 'sanye-theme', 'milan-theme');
                 const rainVideo = document.getElementById('rain-video');
                 const sanyeVideo = document.getElementById('sanye-video');
                 const backBtn = document.getElementById('back-btn');
                 
-                // 暂停所有视频
                 rainVideo.pause();
                 sanyeVideo.pause();
                 
@@ -1564,7 +1543,6 @@
                 if (theme === 'dark') {
                     document.body.classList.add('dark-mode');
                     darkModeSwitch.checked = true;
-                    // 更新返回按钮样式
                     backBtn.style.backgroundColor = '#2d3748';
                     backBtn.style.color = '#63b3ed';
                     backBtn.style.boxShadow = '1px 1px 3px rgba(0, 0, 0, 0.2)';
@@ -1574,7 +1552,6 @@
                     document.body.classList.add('rain-theme');
                     darkModeSwitch.checked = false;
                     rainVideo.play();
-                    // 更新返回按钮样式
                     backBtn.style.backgroundColor = 'rgba(30, 40, 50, 0.6)';
                     backBtn.style.color = '#a0c8ff';
                     backBtn.style.backdropFilter = 'blur(3px)';
@@ -1583,7 +1560,6 @@
                     document.body.classList.add('sanye-theme');
                     darkModeSwitch.checked = false;
                     sanyeVideo.play();
-                    // 更新返回按钮样式
                     backBtn.style.backgroundColor = 'rgba(30, 30, 30, 0.4)';
                     backBtn.style.color = 'rgba(255, 255, 255, 0.9)';
                     backBtn.style.backdropFilter = 'blur(5px)';
@@ -1591,14 +1567,12 @@
                 } else if (theme === 'milan') {
                     document.body.classList.add('milan-theme');
                     darkModeSwitch.checked = false;
-                    // 更新返回按钮样式
                     backBtn.style.backgroundColor = 'rgba(180, 160, 120, 0.7)';
                     backBtn.style.color = '#fff';
                     backBtn.style.backdropFilter = 'blur(3px)';
                     backBtn.style.border = '1px solid rgba(180, 160, 120, 0.4)';
                 } else {
                     darkModeSwitch.checked = false;
-                    // 恢复默认返回按钮样式为灰色
                     backBtn.style.backgroundColor = 'rgba(120, 130, 140, 0.7)';
                     backBtn.style.color = 'white';
                     backBtn.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.15)';
@@ -1606,14 +1580,11 @@
                     backBtn.style.backdropFilter = 'none';
                 }
                 
-                // 保存当前主题到本地存储
                 localStorage.setItem('calculatorTheme', theme);
             }
             
-            // 确保视频预览显示第一帧
             document.querySelectorAll('.theme-preview').forEach(preview => {
                 if (preview.tagName.toLowerCase() === 'video') {
-                    // 设置currentTime为一个小值以确保能看到视频的第一帧
                     preview.addEventListener('loadeddata', function() {
                         this.currentTime = 0.1;
                         this.pause();
@@ -1621,86 +1592,65 @@
                     preview.load();
                 }
             });
-            
-            // 设置按钮点击事件
+
             settingsBtn.addEventListener('click', function() {
                 animateSettingsPanel(true);
             });
-            
-            // 关闭设置面板
+
             closeSettings.addEventListener('click', function() {
                 animateSettingsPanel(false);
             });
-            
-            // 点击遮罩层关闭设置面板
+
             overlay.addEventListener('click', function() {
                 animateSettingsPanel(false);
             });
-            
-            // 重置按钮点击事件
+
             document.getElementById('reset-settings').addEventListener('click', function() {
-                // 重置计算器大小
                 calculatorSize = 350;
                 calculatorSizeInput.value = 350;
                 document.querySelector('.calculator').style.width = `350px`;
-                
-                // 重置小数位数
+
                 decimalPlaces = 2;
                 decimalPlacesInput.value = 2;
-                
-                // 重置主题
                 isDarkMode = false;
                 darkModeSwitch.checked = false;
                 applyTheme('light');
             });
             
-            // 选项卡切换
             tabBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
-                    // 如果已经是当前选项卡，不执行任何操作
                     if (btn.classList.contains('active')) return;
-                    
-                    // 获取当前活动的选项卡和目标选项卡内容
+
                     const activeTabContent = document.querySelector('.tab-content.active');
                     const targetTabContent = document.getElementById(`${btn.dataset.tab}-tab`);
                     
                     if (!activeTabContent || !targetTabContent) return;
-                    
-                    // 切换按钮状态
+
                     tabBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    
-                    // 记录当前面板高度
+
                     const currentHeight = activeTabContent.offsetHeight;
                     const tabContentContainer = document.querySelector('.tab-contents-container');
-                    
-                    // 设置当前高度
+
                     tabContentContainer.style.height = `${currentHeight}px`;
-                    
-                    // 强制重绘
+
                     void tabContentContainer.offsetHeight;
-                    
-                    // 先隐藏当前内容，显示目标内容以获取实际高度
                     activeTabContent.classList.remove('active');
                     targetTabContent.classList.add('active');
-                    
-                    // 动画过渡到新高度
+
                     const targetHeight = targetTabContent.offsetHeight;
                     tabContentContainer.style.transition = 'height 0.3s ease';
                     tabContentContainer.style.height = `${targetHeight}px`;
                     
-                    // 完成后重置
                     setTimeout(() => {
                         tabContentContainer.style.height = 'auto';
                         tabContentContainer.style.transition = '';
                     }, 300);
                 });
             });
-            
-            // 设置计算器大小
+
             calculatorSizeInput.addEventListener('change', function() {
                 calculatorSize = parseInt(this.value);
-                // 添加大小限制
                 if (calculatorSize < 300) {
                     calculatorSize = 300;
                     this.value = 300;
@@ -1711,10 +1661,8 @@
                 document.querySelector('.calculator').style.width = `${calculatorSize}px`;
             });
             
-            // 设置小数点保留位数
             decimalPlacesInput.addEventListener('change', function() {
                 decimalPlaces = parseInt(this.value);
-                // 添加小数位数限制
                 if (decimalPlaces < 0) {
                     decimalPlaces = 0;
                     this.value = 0;
@@ -1722,21 +1670,18 @@
                     decimalPlaces = 25;
                     this.value = 25;
                 }
-                // 如果当前显示的是数字，则应用新的小数点设置
                 if (!isNaN(parseFloat(currentValue))) {
                     currentValue = parseFloat(currentValue).toFixed(decimalPlaces);
                     currentDisplay.textContent = currentValue;
                 }
             });
             
-            // 切换暗黑模式
             darkModeSwitch.addEventListener('change', function() {
                 isDarkMode = this.checked;
                 
                 if (isDarkMode) {
                     applyTheme('dark');
                 } else {
-                    // 恢复之前的非暗黑主题，如果是dark则使用light
                     if (currentTheme === 'dark') {
                         applyTheme('light');
                     } else {
@@ -1745,12 +1690,10 @@
                 }
             });
             
-            // 主题选择
             themeOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     const theme = this.dataset.theme;
                     
-                    // 如果选择的是需要下载的主题并且尚未下载
                     if ((theme === 'rain' || theme === 'sanye') && !isThemeDownloaded(theme)) {
                         downloadTheme(theme);
                     } else {
@@ -1759,7 +1702,6 @@
                 });
             });
             
-            // 更新主题选择UI
             function updateThemeSelection(theme) {
                 themeOptions.forEach(option => {
                     if (option.dataset.theme === theme) {
@@ -1770,7 +1712,6 @@
                 });
             }
             
-            // 模式切换 
             basicMode.addEventListener('click',  function() { 
                 basicMode.classList.add('active'); 
                 scientificMode.classList.remove('active'); 
@@ -2204,7 +2145,6 @@
                 return result;
             } 
             
-            // 键盘支持
             document.addEventListener('keydown',  function(event) { 
                 const key = event.key; 
                  
@@ -2240,13 +2180,11 @@
                 }
             });
              
-            // 添加:contains选择器
             jQuery.expr[':'].contains  = function(a, i, m) {
                 return jQuery(a).text().toUpperCase() 
                     .indexOf(m[3].toUpperCase()) >= 0; 
             };
             
-            // 检查当前主题并应用对应的返回按钮样式
             function applyBackButtonTheme() {
                 const backBtn = document.getElementById('back-btn');
                 if (document.body.classList.contains('dark-mode')) {
@@ -2267,14 +2205,11 @@
                 }
             }
 
-            // 初始化主题并应用返回按钮样式
             applyBackButtonTheme();
             
-            // 页面加载效果
             document.body.classList.add('loaded');
         }); 
 
-        // 返回首页过渡效果
         document.getElementById('back-btn').addEventListener('click', function(e) {
             e.preventDefault();
             const href = this.getAttribute('href');
@@ -2287,31 +2222,24 @@
             }, 300);
         });
 
-        // 从本地存储加载主题
         function loadSavedTheme() {
             const savedTheme = localStorage.getItem('calculatorTheme');
             if (savedTheme) {
                 if ((savedTheme === 'rain' || savedTheme === 'sanye') && !isThemeDownloaded(savedTheme)) {
-                    // 如果选择的主题需要下载但尚未下载
                     downloadTheme(savedTheme);
                 } else {
-                    // 直接应用已下载的主题
                     applyTheme(savedTheme);
                 }
             } else {
-                // 默认应用亮色主题
                 applyTheme('light');
             }
         }
         
-        // 获取已下载的主题状态
         function checkDownloadedThemes() {
-            // 检查每个可下载主题的状态
             themeResources.rain.downloaded = localStorage.getItem('theme_rain_downloaded') === 'true';
             themeResources.sanye.downloaded = localStorage.getItem('theme_sanye_downloaded') === 'true';
         }
         
-        // 页面加载完成后立即应用主题
         window.addEventListener('load', function() {
             checkDownloadedThemes();
             loadSavedTheme();

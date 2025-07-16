@@ -6,8 +6,8 @@
     <title>文本大小写转换 - Dreamirage Tool</title>
     <meta name="description" content="快速转换文本大小写，支持多种格式">
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="img/logo.png" type="image/png">
     <style>
-        /* 使用本地MiSans字体，不再引用Google Fonts */
         
         :root {
             --primary-color: #4361ee;
@@ -413,7 +413,6 @@
     </footer>
     
     <script>
-        // DOM元素
         const inputText = document.getElementById('input-text');
         const charCount = document.getElementById('char-count');
         const wordCount = document.getElementById('word-count');
@@ -437,35 +436,28 @@
         const sampleMixed = document.getElementById('sample-mixed');
         const sampleCode = document.getElementById('sample-code');
         
-        // 更新文本统计信息
         function updateTextInfo() {
             const text = inputText.value;
             
-            // 字符数（包括空格）
             charCount.textContent = text.length;
-            
-            // 单词数（简单计算，按空格分割）
+
             const words = text.trim().split(/\s+/);
             wordCount.textContent = text.trim() === '' ? 0 : words.length;
-            
-            // 行数
+
             const lines = text.split('\n');
             lineCount.textContent = text === '' ? 0 : lines.length;
         }
         
-        // 转换为小写
         lowercaseBtn.addEventListener('click', () => {
             inputText.value = inputText.value.toLowerCase();
             updateTextInfo();
         });
         
-        // 转换为大写
         uppercaseBtn.addEventListener('click', () => {
             inputText.value = inputText.value.toUpperCase();
             updateTextInfo();
         });
         
-        // 首字母大写
         capitalizeBtn.addEventListener('click', () => {
             inputText.value = inputText.value.toLowerCase().replace(/(?:^|\s)\S/g, function(a) {
                 return a.toUpperCase();
@@ -473,7 +465,6 @@
             updateTextInfo();
         });
         
-        // 句首大写
         sentenceCaseBtn.addEventListener('click', () => {
             inputText.value = inputText.value.toLowerCase().replace(/(^\s*|[.!?]\s+)\S/g, function(a) {
                 return a.toUpperCase();
@@ -481,7 +472,6 @@
             updateTextInfo();
         });
         
-        // 标题格式（每个单词首字母大写，排除冠词等小词）
         titleCaseBtn.addEventListener('click', () => {
             const smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|nor|of|on|or|per|the|to|vs?\.?|via)$/i;
             
@@ -503,7 +493,6 @@
             updateTextInfo();
         });
         
-        // 交替大小写
         alternatingCaseBtn.addEventListener('click', () => {
             let result = '';
             for (let i = 0; i < inputText.value.length; i++) {
@@ -517,7 +506,6 @@
             updateTextInfo();
         });
         
-        // 反转大小写
         inverseCaseBtn.addEventListener('click', () => {
             let result = '';
             for (let i = 0; i < inputText.value.length; i++) {
@@ -532,7 +520,6 @@
             updateTextInfo();
         });
         
-        // 驼峰命名法
         camelCaseBtn.addEventListener('click', () => {
             inputText.value = inputText.value
                 .replace(/[^a-zA-Z0-9\s]/g, '')
@@ -543,7 +530,6 @@
             updateTextInfo();
         });
         
-        // 帕斯卡命名法
         pascalCaseBtn.addEventListener('click', () => {
             inputText.value = inputText.value
                 .replace(/[^a-zA-Z0-9\s]/g, '')
@@ -554,7 +540,6 @@
             updateTextInfo();
         });
         
-        // 蛇形命名法
         snakeCaseBtn.addEventListener('click', () => {
             inputText.value = inputText.value
                 .replace(/\s+/g, '_')
@@ -563,7 +548,6 @@
             updateTextInfo();
         });
         
-        // 短横线命名法
         kebabCaseBtn.addEventListener('click', () => {
             inputText.value = inputText.value
                 .replace(/\s+/g, '-')
@@ -572,26 +556,22 @@
             updateTextInfo();
         });
         
-        // 移除空格
         removeSpacesBtn.addEventListener('click', () => {
             inputText.value = inputText.value.replace(/\s+/g, '');
             updateTextInfo();
         });
-        
-        // 复制结果
+
         copyBtn.addEventListener('click', () => {
             inputText.select();
             document.execCommand('copy');
             alert('文本已复制到剪贴板');
         });
         
-        // 清空文本
         clearBtn.addEventListener('click', () => {
             inputText.value = '';
             updateTextInfo();
         });
         
-        // 示例文本
         sampleLorem.addEventListener('click', () => {
             inputText.value = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
             updateTextInfo();
@@ -636,10 +616,8 @@ console.log("Total price: $" + totalPrice.toFixed(2));`;
             updateTextInfo();
         });
         
-        // 输入文本时更新统计信息
         inputText.addEventListener('input', updateTextInfo);
         
-        // 初始化
         updateTextInfo();
     </script>
 </body>

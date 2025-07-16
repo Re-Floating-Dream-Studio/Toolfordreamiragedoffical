@@ -6,8 +6,8 @@
     <title>单位换算工具 - Dreamirage Tool</title>
     <meta name="description" content="长度、重量、面积等多种单位间的快速转换工具">
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="img/logo.png" type="image/png">
     <style>
-        /* 使用本地MiSans字体，不再引用Google Fonts */
         
         :root {
             --primary-color: #4361ee;
@@ -178,7 +178,6 @@
             color: var(--text-light);
         }
         
-        /* 单位类别选择 */
         .unit-tabs {
             display: flex;
             flex-wrap: wrap;
@@ -239,7 +238,6 @@
                     <div class="unit-tab" data-type="speed">速度</div>
                 </div>
                 
-                <!-- 长度转换 -->
                 <div class="converter-container active" id="length">
                     <div class="converter-grid">
                         <div class="form-group">
@@ -312,30 +310,25 @@
     </footer>
     
     <script>
-        // 单位标签切换
         const unitTabs = document.querySelectorAll('.unit-tab');
         const converterContainers = document.querySelectorAll('.converter-container');
         
         unitTabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                // 移除所有活动状态
                 unitTabs.forEach(t => t.classList.remove('active'));
                 converterContainers.forEach(c => c.classList.remove('active'));
                 
-                // 添加当前活动状态
                 tab.classList.add('active');
                 const type = tab.getAttribute('data-type');
                 document.getElementById(type).classList.add('active');
             });
         });
         
-        // 长度单位转换功能
         const lengthInput = document.getElementById('length-input');
         const lengthFrom = document.getElementById('length-from');
         const lengthTo = document.getElementById('length-to');
         const lengthResult = document.getElementById('length-result');
         
-        // 长度转换比率 (相对于米)
         const lengthRatios = {
             mm: 0.001,
             cm: 0.01,
@@ -347,7 +340,6 @@
             mi: 1609.344
         };
         
-        // 计算和显示结果
         function calculateLength() {
             if (!lengthInput.value) {
                 lengthResult.textContent = '请输入数值';
@@ -358,14 +350,12 @@
             const fromUnit = lengthFrom.value;
             const toUnit = lengthTo.value;
             
-            // 转换为标准单位 (米)，然后转换为目标单位
             const meters = inputValue * lengthRatios[fromUnit];
             const result = meters / lengthRatios[toUnit];
             
             lengthResult.textContent = `${inputValue} ${getUnitFullName(fromUnit)} = ${result.toFixed(6)} ${getUnitFullName(toUnit)}`;
         }
         
-        // 获取单位全名
         function getUnitFullName(unit) {
             const unitNames = {
                 mm: '毫米',
@@ -380,12 +370,10 @@
             return unitNames[unit] || unit;
         }
         
-        // 添加事件监听器
         lengthInput.addEventListener('input', calculateLength);
         lengthFrom.addEventListener('change', calculateLength);
         lengthTo.addEventListener('change', calculateLength);
         
-        // 初始加载时计算一次 (如果有输入值)
         if (lengthInput.value) {
             calculateLength();
         }
